@@ -16,6 +16,13 @@ pip install -r requirements.txt
 python setup.py install  # in the directory with venv-oprf activated
 ```
 
+## Usage
+
+```bash
+python server.py
+python client.py  # in another terminal
+```
+
 ### oprfs issues
 
 ```bash

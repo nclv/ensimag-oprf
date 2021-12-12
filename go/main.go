@@ -64,6 +64,7 @@ func ClientServerOPRF(inputs [][]byte, info []byte, client *oprf.Client, server 
 		log.Println(err)
 	}
 
+	log.Println(clientRequest.BlindedElements())
 	// Evaluate evaluates a set of blinded inputs from the client.
 	// BlindedElements returns the serialized blinded elements produced for the client request.
 	// TODO: Send the blinded inputs to the server.

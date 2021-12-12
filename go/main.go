@@ -125,7 +125,6 @@ func main() {
 	// TODO: choose the suite and the mode, send it to the server that choose the right instance
 	client := GetClient(suite, mode, publicKey)
 
-
 	ServerSideOPRF([]byte("hello world"), []byte("test info"), server)
 	// In the base mode, a client and server interact to
 	// compute output = F(skS, input, info), where input is the client's

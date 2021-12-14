@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"flag"
 	"log"
 
@@ -50,7 +51,8 @@ func main() {
 		return
 	}
 
-	info := string(token)
+	info := hex.EncodeToString(token)
+	log.Println("Public information : ", info)
 
 	evaluationRequest := &EvaluationRequest{
 		Suite:           suite,

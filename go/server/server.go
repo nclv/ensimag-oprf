@@ -8,11 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const (
-	HOST = "localhost"
-	PORT = "1323"
-)
-
 type (
 	KeyMap    map[oprf.SuiteID]*oprf.PrivateKey
 	ServerMap map[oprf.Mode]map[oprf.SuiteID]*oprf.Server
@@ -28,7 +23,7 @@ type Server struct {
 }
 
 func NewServer() *Server {
-	return &Server{
+	return &Server{ //nolint:exhaustivestruct
 		keys:    make(KeyMap),
 		servers: make(ServerMap),
 	}
@@ -43,9 +38,9 @@ func (s *Server) Initialize() {
 // generatePrivateKeys Initialize the private keys
 func (s *Server) generatePrivateKeys() {
 	s.keysMu.Lock()
-	s.keys[oprf.OPRFP256] = generatePrivateKey(oprf.OPRFP256)
-	s.keys[oprf.OPRFP384] = generatePrivateKey(oprf.OPRFP384)
-	s.keys[oprf.OPRFP521] = generatePrivateKey(oprf.OPRFP521)
+	s.keys[oprf.OPRFP256] = GeneratePrivateKey(oprf.OPRFP256)
+	s.keys[oprf.OPRFP384] = GeneratePrivateKey(oprf.OPRFP384)
+	s.keys[oprf.OPRFP521] = GeneratePrivateKey(oprf.OPRFP521)
 	s.keysMu.Unlock()
 }
 
@@ -55,8 +50,8 @@ func (s *Server) createServersSuite(suite oprf.SuiteID) {
 	privateKey := s.keys[suite]
 	s.keysMu.RUnlock()
 
-	s.servers[oprf.BaseMode][suite] = createServer(suite, oprf.BaseMode, privateKey)
-	s.servers[oprf.VerifiableMode][suite] = createServer(suite, oprf.VerifiableMode, privateKey)
+	s.servers[oprf.BaseMode][suite] = NewOPRFServer(suite, oprf.BaseMode, privateKey)
+	s.servers[oprf.VerifiableMode][suite] = NewOPRFServer(suite, oprf.VerifiableMode, privateKey)
 }
 
 // initializeServers Initialize the servers for the allowed encryption suite
@@ -90,7 +85,7 @@ func (s *Server) getKeys(c echo.Context) error {
 	keys := make(map[oprf.SuiteID][]byte)
 
 	for suiteID, privateKey := range s.keys {
-		keys[suiteID] = serializePublicKey(privateKey)
+		keys[suiteID] = SerializePublicKey(privateKey)
 	}
 	s.keysMu.RUnlock()
 
@@ -125,19 +120,5 @@ func (s *Server) evaluate(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, evaluation)
-}
-
-func main() {
-	e := echo.New()
-
-	// TODO: https://echo.labstack.com/cookbook/auto-tls/
-
-	server := NewServer()
-	server.Initialize()
-
-	e.GET("/request_public_keys", server.getKeys)
-	e.POST("/evaluate", server.evaluate)
-
-	e.Logger.Fatal(e.Start(HOST + ":" + PORT))
+	return c.JSON(http.StatusOK, evaluation) //nolint:wrapcheck
 }

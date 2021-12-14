@@ -2,25 +2,23 @@ package main
 
 import (
 	"crypto/rand"
-	"github.com/cloudflare/circl/oprf"
 	"log"
+
+	"github.com/cloudflare/circl/oprf"
 )
 
-// generatePrivateKey generate a private key for the encryption suite
-func generatePrivateKey(suite oprf.SuiteID) *oprf.PrivateKey {
+// GeneratePrivateKey generate a private key for the encryption suite
+func GeneratePrivateKey(suite oprf.SuiteID) *oprf.PrivateKey {
 	privateKey, err := oprf.GenerateKey(suite, rand.Reader)
 	if err != nil {
 		log.Println(err)
 	}
 
-	// printKey(privateKey)
-	// printKey(privateKey.Public())
-
 	return privateKey
 }
 
-// serializePublicKey is a wrapper to serialize a public key
-func serializePublicKey(key *oprf.PrivateKey) []byte {
+// SerializePublicKey is a wrapper to serialize a public key
+func SerializePublicKey(key *oprf.PrivateKey) []byte {
 	publicKey, err := key.Public().Serialize()
 	if err != nil {
 		log.Println(err)
@@ -29,8 +27,8 @@ func serializePublicKey(key *oprf.PrivateKey) []byte {
 	return publicKey
 }
 
-// createServer create a server with the provided suite, mode and private key
-func createServer(suite oprf.SuiteID, mode oprf.Mode, privateKey *oprf.PrivateKey) *oprf.Server {
+// NewOPRFServer create an OPRF server with the provided suite, mode and private key
+func NewOPRFServer(suite oprf.SuiteID, mode oprf.Mode, privateKey *oprf.PrivateKey) *oprf.Server {
 	var (
 		server *oprf.Server
 		err    error

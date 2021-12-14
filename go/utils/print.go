@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ type Key interface {
 	Serialize() ([]byte, error)
 }
 
-func printKey(key Key) {
+func PrintKey(key Key) {
 	bytesKey, err := key.Serialize()
 	if err != nil {
 		log.Println(err)
 	}
 
-	printByteArray(bytesKey)
+	PrintByteArray(bytesKey)
 }
 
-func printByteArray(byteArray []byte)  {
+func PrintByteArray(byteArray []byte) {
 	log.Println(fmt.Sprintf("%x", byteArray))
 }

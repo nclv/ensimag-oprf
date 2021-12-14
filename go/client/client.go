@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -75,10 +74,10 @@ func DeserializePublicKeys(serializedPublicKeys map[oprf.SuiteID][]byte) map[opr
 	publicKeys := make(map[oprf.SuiteID]*oprf.PublicKey)
 
 	for suiteID, serializedPublicKey := range serializedPublicKeys {
-		log.Println(
-			"Suite ID:", suiteID,
-			", Public key : ", base64.StdEncoding.EncodeToString(serializedPublicKey),
-		)
+		// log.Println(
+		// 	"Suite ID:", suiteID,
+		//	", Public key : ", base64.StdEncoding.EncodeToString(serializedPublicKey),
+		// )
 
 		publicKey := new(oprf.PublicKey)
 		if err := publicKey.Deserialize(suiteID, serializedPublicKey); err != nil {

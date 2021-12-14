@@ -10,10 +10,21 @@ curl -X POST http://localhost:1323/evaluate -H 'Content-Type: application/json' 
 {"Elements":["AnzOnrnGUiaNurfXL3HXR9u7IQfQHMJ0T7alfEVn4339","A0jpFesUdIFhySiR2u9+FKAJSkGCrKyI7X8w7B2GurbA"],"Proof":null}
 
 {"suite":3,"mode":1,"blinded_elements":["MTIzNA==","MjMz"]}  # Base64 encoded strings
+
+# Endpoint load testing with ali
+ali --body-file=evaluate.json -H 'Content-Type: application/json' --method=POST http://127.0.0.1:1323/evaluate
 ```
 
 ## Client
 ```bash
 # Defaults are BaseMode (0x00) and OPRFP256 (0x003)
 go run client.go clientUtils.go -mode=1 -suite=4
+
+# OPRF256 Base Mode benchmark
+go test -bench=BenchmarkClientBaseModeOPRFP256 -benchmem -memprofile memprofile.pprof -cpuprofile cpuprofile.pprof
+go tool pprof -http=:8080 cpuprofile.pprof
+
+# OPRF256 Verifiable Mode benchmark
+go test -bench=BenchmarkClientVerifiableModeOPRFP256 -benchmem -memprofile memprofile_verif.pprof -cpuprofile cpuprofile_verif.pprof
+go tool pprof -http=:8081 cpuprofile_verif.pprof
 ```

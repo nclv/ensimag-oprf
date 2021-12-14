@@ -15,7 +15,7 @@ var (
 	suite oprf.SuiteID
 )
 
-func init() {
+func commandLine() {
 	modeFlag := flag.Int("mode", int(oprf.BaseMode), "mode")
 	suiteFlag := flag.Int("suite", int(oprf.OPRFP256), "cipher suite")
 
@@ -26,6 +26,8 @@ func init() {
 }
 
 func main() {
+	commandLine()
+
 	log.Println(mode, suite)
 
 	// Setup

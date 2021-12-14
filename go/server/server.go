@@ -111,6 +111,7 @@ func (s *Server) evaluate(c echo.Context) error {
 	s.serversMu.RLock()
 	server := s.servers[evaluationRequest.Mode][evaluationRequest.Suite]
 	s.serversMu.RUnlock()
+
 	if server == nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "No server")
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"flag"
 	"log"
@@ -33,7 +34,24 @@ func main() {
 	// Request of pseudonymization
 	clientRequest := client.CreateRequest([][]byte{{0x00}, []byte("Hello")})
 
-	info := "7465737420696e666f"
+	// The public information
+	// It is RECOMMENDED that this metadata be constructed with some type of higher-level
+	// domain separation to avoid cross protocol attacks or related issues.
+	// For example, protocols using this construction might ensure that the metadata uses
+	// a unique, prefix-free encoding.
+	// Any system which has multiple POPRF applications should distinguish client inputs to
+	// ensure the POPRF results are separate.
+	// info := "7465737420696e666f"
+	// Generate a random information for each request for non-deterministic results
+	token := make([]byte, 256)
+	if _, err := rand.Read(token); err != nil {
+		log.Println(err)
+
+		return
+	}
+
+	info := string(token)
+
 	evaluationRequest := &EvaluationRequest{
 		Suite:           suite,
 		Mode:            mode,

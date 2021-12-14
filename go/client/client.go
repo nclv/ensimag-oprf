@@ -101,6 +101,7 @@ func (c *Client) CreateRequest(inputs [][]byte) *oprf.ClientRequest {
 	return clientRequest
 }
 
+// EvaluateRequest
 func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) *oprf.Evaluation {
 	data, err := json.Marshal(&evaluationRequest)
 	if err != nil {

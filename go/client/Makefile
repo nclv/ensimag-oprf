@@ -9,10 +9,10 @@ BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP2
 	BenchmarkClientBaseModeOPRFP521 BenchmarkClientVerifiableModeOPRF521
 
 run:
-	go run .
+	go run ./cmd
 
 build:
-	go build -o ${BINARY_DIR}/client .
+	go build -o ${BINARY_DIR}/client ./cmd
 
 
 test-bench:

@@ -1,4 +1,10 @@
 ## Server
+
+```bash
+# Makefile commands
+make {build,run,load-test,clean}
+```
+
 ```bash
 # Get the public keys
 curl -X GET http://localhost:1323/request_public_keys
@@ -16,6 +22,15 @@ ali --body-file=evaluate.json -H 'Content-Type: application/json' --method=POST 
 ```
 
 ## Client
+
+TODO: 
+- [ ] Handle error on endpoint not found
+
+```bash
+# Makefile commands
+make {build,run,test-bench,profile-bench,clean,clean-binary,clean-perfs}
+```
+
 ```bash
 # Defaults are BaseMode (0x00) and OPRFP256 (0x003)
 go run client.go clientUtils.go -mode=1 -suite=4

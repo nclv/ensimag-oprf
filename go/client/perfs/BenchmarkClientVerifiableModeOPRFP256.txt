@@ -1,0 +1,11 @@
+goos: linux
+goarch: amd64
+pkg: github.com/oprf/go/client
+cpu: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
+BenchmarkClientVerifiableModeOPRFP256-4   	     933	   1267174 ns/op	   54779 B/op	     948 allocs/op
+BenchmarkClientVerifiableModeOPRFP256-4   	     957	   1259677 ns/op	   54800 B/op	     949 allocs/op
+BenchmarkClientVerifiableModeOPRFP256-4   	     952	   1265205 ns/op	   54810 B/op	     948 allocs/op
+BenchmarkClientVerifiableModeOPRFP256-4   	     960	   1252055 ns/op	   54803 B/op	     949 allocs/op
+BenchmarkClientVerifiableModeOPRFP256-4   	     961	   1251547 ns/op	   54778 B/op	     948 allocs/op
+PASS
+ok  	github.com/oprf/go/client	6.846s

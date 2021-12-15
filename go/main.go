@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"log"
 
-	"github.com/oprf/go/utils"
+	"github.com/oprf/go/common"
 
 	"github.com/cloudflare/circl/oprf"
 )
@@ -55,7 +55,7 @@ func ServerSideOPRF(input, info []byte, server *oprf.Server) {
 		log.Println(err)
 	}
 
-	utils.PrintByteArray(output)
+	common.PrintByteArray(output)
 }
 
 // ClientServerOPRF performs a full OPRF protocol with a client and a server.
@@ -88,9 +88,9 @@ func ClientServerOPRF(inputs [][]byte, info []byte, client *oprf.Client, server 
 		output := clientOutputs[index]
 
 		log.Println("Input :")
-		utils.PrintByteArray(input)
+		common.PrintByteArray(input)
 		log.Println("Output :")
-		utils.PrintByteArray(output)
+		common.PrintByteArray(output)
 
 		// VerifyFinalize performs a full OPRF protocol (ie. calls FullEvaluate) and returns true if the
 		// output matches the expected output.
@@ -110,8 +110,8 @@ func main() {
 		log.Println(err)
 	}
 
-	utils.PrintKey(privateKey)
-	utils.PrintKey(privateKey.Public())
+	common.PrintKey(privateKey)
+	common.PrintKey(privateKey.Public())
 
 	// On the server
 	// TODO: create #{suite} * #{mode} servers with different private keys? or with same private key?

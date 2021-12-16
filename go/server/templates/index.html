@@ -28,7 +28,7 @@ license that can be found in the LICENSE file.
 
 		const go = new Go();
 		let mod, inst;
-		WebAssembly.instantiateStreaming(fetch("test.wasm"), go.importObject).then((result) => {
+		WebAssembly.instantiateStreaming(fetch("/static/client.wasm"), go.importObject).then((result) => {
 			mod = result.module;
 			inst = result.instance;
 			document.getElementById("runButton").disabled = false;
@@ -43,6 +43,28 @@ license that can be found in the LICENSE file.
 		}
 	</script>
 
+	<h1>Pseudonymization service</h1>
+	<form id="pseudonymization">
+		<label for="data">Data to pseudonymize :</label><br>
+		<input type="text" id="data" />
+
+		<p>OPRF mode (Base or Verifiable) :</p><br>
+		<label for="base-mode">Base mode</label>
+		<input type="radio" id="base-mode" name="mode" value="0"/><br>
+		<label for="verifiable-mode">Verifiable mode</label>
+		<input type="radio" id="verifiable-mode" name="mode" value="1"/><br>
+
+		<p>OPRF cipher suite (P256, P384 or P521) :</p><br>
+		<label for="p256">P256</label>
+		<input type="radio" id="p256" name="suite" value="3"/><br>
+		<label for="p384">P384</label>
+		<input type="radio" id="p384" name="suite" value="4"/><br>
+		<label for="p521">P521</label>
+		<input type="radio" id="p521" name="suite" value="5"/><br>
+
+		<label for="output">Result :</label><br>
+		<input type="text" id="output" readonly /><br>
+	</form>
 	<button onClick="run();" id="runButton" disabled>Run</button>
 </body>
 

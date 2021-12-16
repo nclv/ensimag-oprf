@@ -3,10 +3,11 @@ package core
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/oprf/go/common"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/oprf/go/common"
 
 	"github.com/cloudflare/circl/oprf"
 )
@@ -43,18 +44,18 @@ func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) {
 func (c *Client) GetPublicKeys() map[oprf.SuiteID][]byte {
 	req, err := http.NewRequest("GET", c.serverURL+PublicKeysEndpoint, nil)
 	if err != nil {
-		log.Println(err)
+		log.Println("HTTP NewRequest error :", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		log.Println(err)
+		log.Println("HTTP Do request :", err)
 	}
 	defer resp.Body.Close()
 
 	var publicKeys map[oprf.SuiteID][]byte
 	if err := json.NewDecoder(resp.Body).Decode(&publicKeys); err != nil {
-		log.Println(err)
+		log.Println("JSON decoder error :", err)
 	}
 
 	// log.Println(publicKeys, base64.StdEncoding.EncodeToString(publicKeys[common.OPRFP256]))
@@ -66,7 +67,7 @@ func (c *Client) GetPublicKeys() map[oprf.SuiteID][]byte {
 func (c *Client) CreateRequest(inputs [][]byte) *oprf.ClientRequest {
 	clientRequest, err := c.oprfClient.Request(inputs)
 	if err != nil {
-		log.Println(err)
+		log.Println("OPRF client request creation error :", err)
 	}
 
 	return clientRequest
@@ -76,7 +77,7 @@ func (c *Client) CreateRequest(inputs [][]byte) *oprf.ClientRequest {
 func (c *Client) EvaluateRequest(evaluationRequest *common.EvaluationRequest) *oprf.Evaluation {
 	data, err := json.Marshal(&evaluationRequest)
 	if err != nil {
-		log.Println(err)
+		log.Println("evaluation request marshalling error :", err)
 	}
 
 	req, err := http.NewRequest("POST", c.serverURL+EvaluateEndpoint, bytes.NewBuffer(data))

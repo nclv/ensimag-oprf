@@ -42,6 +42,7 @@ func main() {
 
 	// Middlewares
 	e.Use(middleware.Logger())
+	e.Use(middleware.CORS())
 
 	// Endpoints
 	e.GET("/", indexHandler)

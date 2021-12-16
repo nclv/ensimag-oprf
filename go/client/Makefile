@@ -1,8 +1,9 @@
-.PHONY: all clean clean-perfs clean-binary run build test-bench profile-bench
+.PHONY: all clean clean-perfs clean-binary run build build-cmd build-wasm test-bench profile-bench
 all: build
 
 BINARY_DIR = ./bin
 PROFILE_DIR = ./perfs
+WASM_DIR = ../server/public
 
 BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP256 \
 	BenchmarkClientBaseModeOPRFP384 BenchmarkClientVerifiableModeOPRFP384 \
@@ -11,9 +12,13 @@ BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP2
 run:
 	go run ./cmd
 
-build:
+build: build-cmd build-wasm
+
+build-cmd:
 	go build -o ${BINARY_DIR}/client ./cmd
 
+build-wasm:
+	GOOS=js GOARCH=wasm go build -o ${WASM_DIR}/client.wasm ./wasm
 
 test-bench:
 	go test -bench .

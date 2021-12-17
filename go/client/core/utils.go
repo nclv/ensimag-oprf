@@ -8,7 +8,7 @@ import (
 
 // NewOPRFClient create an OPRF client with the provided suite, mode and public key.
 // No public key is needed for oprf.BaseMode.
-func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) *oprf.Client {
+func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) (*oprf.Client, error) {
 	var (
 		client *oprf.Client
 		err    error
@@ -21,10 +21,12 @@ func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) *opr
 	}
 
 	if err != nil {
-		log.Println(err)
+		log.Println("error when creating OPRF client", err)
+
+		return nil, err
 	}
 
-	return client
+	return client, nil
 }
 
 // DeserializePublicKeys deserialize the server's public keys

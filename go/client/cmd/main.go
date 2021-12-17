@@ -35,7 +35,11 @@ func main() {
 
 	// Setup
 	client := core.NewClient("http://localhost:1323")
-	client.SetupOPRFClient(suite, mode)
+	if err := client.SetupOPRFClient(suite, mode); err != nil {
+		log.Println(err)
+
+		return
+	}
 
 	// Request of pseudonymization
 	clientRequest := client.CreateRequest([][]byte{{0x00}, []byte("Hello")})

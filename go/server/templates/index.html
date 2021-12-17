@@ -31,6 +31,7 @@ license that can be found in the LICENSE file.
 		WebAssembly.instantiateStreaming(fetch("/static/client.wasm"), go.importObject).then((result) => {
 			mod = result.module;
 			inst = result.instance;
+			// Activate the button on wasm file load
 			document.getElementById("runButton").disabled = false;
 		}).catch((err) => {
 			console.error(err);
@@ -38,8 +39,33 @@ license that can be found in the LICENSE file.
 
 		async function run() {
 			console.clear();
+			console.log("test");
+			get_selection();
 			await go.run(inst);
 			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+		}
+
+		function get_selection() {
+			let info = {}
+			document.getElementsByName("suite").forEach((i)=>{if(i.checked) { info["suite"] = i.value }})
+			document.getElementsByName("mode").forEach((i)=>{if(i.checked) { info["mode"] = i.value }})
+			console.log(info)
+		}
+
+		async function AsyncPseudonymize(jsonInput) {
+			try {
+				const objectOutput = await pseudonymize(jsonInput)
+				console.log(objectOutput)
+				// const reader = response.body.getReader()
+				// let done = false
+				// while (!done) {
+				// 	const read = await reader.read()
+				//	done = read && read.done
+				//	console.log('Read', read.value.length, 'bytes')
+				// }
+			} catch (err) {
+				console.error('Caught exception', err)
+			}
 		}
 	</script>
 

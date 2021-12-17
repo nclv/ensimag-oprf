@@ -32,12 +32,22 @@ func NewClient(serverURL string) *Client {
 }
 
 // SetupOPRFClient retrieve the server's public keys and create the OPRF client.
-func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) {
+func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	serializedPublicKeys := c.GetPublicKeys()
 	publicKeys := DeserializePublicKeys(serializedPublicKeys)
 
 	c.publicKeys = publicKeys
-	c.oprfClient = NewOPRFClient(suite, mode, publicKeys[suite])
+
+	oprfClient, err := NewOPRFClient(suite, mode, publicKeys[suite])
+	if err != nil {
+		log.Println("error when setting up the OPRF client", err)
+
+		return err
+	}
+
+	c.oprfClient = oprfClient
+
+	return nil
 }
 
 // GetPublicKeys returns the public keys from the server

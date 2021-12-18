@@ -70,16 +70,3 @@ make profile-bench
 # Show the profiles
 go tool pprof -http=:8080 <profile>.pprof
 ```
-
-```bash
-# Defaults are BaseMode (0x00) and OPRFP256 (0x003)
-go run client.go clientUtils.go -mode=1 -suite=4
-
-# OPRF256 Base Mode benchmark
-go test -bench=BenchmarkClientBaseModeOPRFP256 -benchmem -memprofile memprofile.pprof -cpuprofile cpuprofile.pprof
-go tool pprof -http=:8080 cpuprofile.pprof
-
-# OPRF256 Verifiable Mode benchmark
-go test -bench=BenchmarkClientVerifiableModeOPRFP256 -benchmem -memprofile memprofile_verif.pprof -cpuprofile cpuprofile_verif.pprof
-go tool pprof -http=:8081 cpuprofile_verif.pprof
-```

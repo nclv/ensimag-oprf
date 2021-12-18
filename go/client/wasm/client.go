@@ -17,11 +17,14 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 	// Set up the client with the mode and suite
 	client := core.NewClient(serverURL)
 	if err := client.SetupOPRFClient(request.Suite, request.Mode); err != nil {
-		return [][]byte{}, fmt.Errorf("couldn't setup OPRF client : %w", err)
+		return nil, fmt.Errorf("couldn't setup OPRF client : %w", err)
 	}
 
 	// Request of pseudonymization
-	clientRequest := client.CreateRequest(request.Data)
+	clientRequest, err := client.CreateRequest(request.Data)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create the request : %w", err)
+	}
 
 	// The public information (client SECRET)
 	// It is RECOMMENDED that this metadata be constructed with some type of higher-level
@@ -46,13 +49,19 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 	evaluationRequest := common.NewEvaluationRequest(
 		request.Suite, request.Mode, info, clientRequest.BlindedElements(),
 	)
-	evaluation := client.EvaluateRequest(evaluationRequest)
+	evaluation, err := client.EvaluateRequest(evaluationRequest)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate the request : %w", err)
+	}
 
 	//for _, element := range evaluation.Elements {
 	//	log.Println("Evaluation : ", base64.StdEncoding.EncodeToString(element))
 	//}
 
-	outputs := client.Finalize(clientRequest, evaluation, info)
+	outputs, err := client.Finalize(clientRequest, evaluation, info)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't finalize the request : %w", err)
+	}
 
 	//for _, output := range outputs {
 	//	log.Println("Output : ", base64.StdEncoding.EncodeToString(output))

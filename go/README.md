@@ -41,12 +41,17 @@ make load-test
 
 ## Client
 
-TODO: 
-- [ ] Handle error on endpoint not found
+The client 
 
 ```bash
 # Makefile commands
 make {build build-cmd build-wasm run clean clean-perfs clean-binary test-bench profile-bench}
+```
+
+### Compile the .wasm binary into the server public/ directory
+
+```bash
+make build-wasm
 ```
 
 ### Launch the client CLI
@@ -67,6 +72,6 @@ go run ./cmd/ -mode=1 -suite=4 deadbeef one "My name is"
 make test-bench
 # Generate the memory profile, cpu profile and traces for each benchmarks in perfs/
 make profile-bench
-# Show the profiles
+# Analyse one of the generated profiles
 go tool pprof -http=:8080 <profile>.pprof
 ```

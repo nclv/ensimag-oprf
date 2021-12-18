@@ -38,8 +38,6 @@ func main() {
 	// Set up the OPRF client
 	client := core.NewClient("http://localhost:1323")
 	if err := client.SetupOPRFClient(suite, mode); err != nil {
-		log.Println(err)
-
 		return
 	}
 
@@ -54,7 +52,10 @@ func main() {
 	}
 
 	// Request of pseudonymization
-	clientRequest := client.CreateRequest(dataBytes)
+	clientRequest, err := client.CreateRequest(dataBytes)
+	if err != nil {
+		return
+	}
 
 	// The public information
 	// It is RECOMMENDED that this metadata be constructed with some type of higher-level
@@ -78,13 +79,19 @@ func main() {
 	evaluationRequest := common.NewEvaluationRequest(
 		suite, mode, info, clientRequest.BlindedElements(),
 	)
-	evaluation := client.EvaluateRequest(evaluationRequest)
+	evaluation, err := client.EvaluateRequest(evaluationRequest)
+	if err != nil {
+		return
+	}
 
 	for _, element := range evaluation.Elements {
 		log.Println("Evaluation : ", base64.StdEncoding.EncodeToString(element))
 	}
 
-	outputs := client.Finalize(clientRequest, evaluation, info)
+	outputs, err := client.Finalize(clientRequest, evaluation, info)
+	if err != nil {
+		return
+	}
 
 	for _, output := range outputs {
 		log.Println("Output : ", base64.StdEncoding.EncodeToString(output))

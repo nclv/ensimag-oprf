@@ -41,7 +41,7 @@ make load-test
 
 ## Client
 
-The client 
+The client is composed of a CLI for command-line interaction with the server (`/cmd` directory). The WASM binary is generated from the code into `/wasm` to the `/server/public` directory.
 
 ```bash
 # Makefile commands

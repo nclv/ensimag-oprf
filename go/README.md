@@ -1,9 +1,23 @@
 ## Server
 
+The server provides 2 endpoints :
+- `/request_public_keys` to retrieve the server's public keys for each encryption suite (P256, P384, P521),
+- `/evaluate` evaluates an array of blinded element.
+
+The information must be private to avoid non-deterministic results. It needs to be shared between the client (Finalization) and the server (Evaluation).
+
 ```bash
 # Makefile commands
 make {build,run,load-test,clean}
 ```
+
+### Launch the server
+
+```bash
+make run
+```
+
+### Using cURL
 
 ```bash
 # Get the public keys
@@ -16,9 +30,13 @@ curl -X POST http://localhost:1323/evaluate -H 'Content-Type: application/json' 
 {"Elements":["AnzOnrnGUiaNurfXL3HXR9u7IQfQHMJ0T7alfEVn4339","A0jpFesUdIFhySiR2u9+FKAJSkGCrKyI7X8w7B2GurbA"],"Proof":null}
 
 {"suite":3,"mode":1,"blinded_elements":["MTIzNA==","MjMz"]}  # Base64 encoded strings
+```
 
-# Endpoint load testing with ali
-ali --body-file=evaluate.json -H 'Content-Type: application/json' --method=POST http://127.0.0.1:1323/evaluate
+### Load testing
+`/evaluate` endpoint load testing with `ali` :
+
+```bash
+make load-test
 ```
 
 ## Client
@@ -29,6 +47,28 @@ TODO:
 ```bash
 # Makefile commands
 make {build build-cmd build-wasm run clean clean-perfs clean-binary test-bench profile-bench}
+```
+
+### Launch the client CLI
+
+```bash
+# Run the test with default mode and suite
+make run
+# Run the client with specific mode and suite on default input data [][]byte{{0x00}, {0xFF}}
+go run ./cmd/ -mode=1 -suite=5
+# Run the client on a list of inputs ["deadbeef", "one", "My name is"]
+go run ./cmd/ -mode=1 -suite=4 deadbeef one "My name is"
+```
+
+### Benchmarks
+
+```bash
+# Run all benchmarks
+make test-bench
+# Generate the memory profile, cpu profile and traces for each benchmarks in perfs/
+make profile-bench
+# Show the profiles
+go tool pprof -http=:8080 <profile>.pprof
 ```
 
 ```bash

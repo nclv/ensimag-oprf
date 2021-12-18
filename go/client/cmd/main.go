@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	data  []string
 	mode  oprf.Mode
 	suite oprf.SuiteID
 )
@@ -23,6 +24,7 @@ func commandLine() {
 	suiteFlag := flag.Int("suite", int(oprf.OPRFP256), "cipher suite")
 
 	flag.Parse()
+	data = flag.Args()
 
 	mode = oprf.Mode(*modeFlag)
 	suite = oprf.SuiteID(*suiteFlag)
@@ -33,7 +35,7 @@ func main() {
 
 	log.Println(mode, suite)
 
-	// Setup
+	// Set up the OPRF client
 	client := core.NewClient("http://localhost:1323")
 	if err := client.SetupOPRFClient(suite, mode); err != nil {
 		log.Println(err)
@@ -41,8 +43,18 @@ func main() {
 		return
 	}
 
+	// Convert the string input to bytes
+	dataBytes := make([][]byte, len(data))
+	for index, input := range data {
+		dataBytes[index] = []byte(input)
+	}
+	// Set default inputs if no data is provided
+	if len(dataBytes) == 0 {
+		dataBytes = append(dataBytes, [][]byte{{0x00}, {0xFF}}...)
+	}
+
 	// Request of pseudonymization
-	clientRequest := client.CreateRequest([][]byte{{0x00}, []byte("Hello")})
+	clientRequest := client.CreateRequest(dataBytes)
 
 	// The public information
 	// It is RECOMMENDED that this metadata be constructed with some type of higher-level

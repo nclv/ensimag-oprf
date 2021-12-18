@@ -39,8 +39,8 @@ license that can be found in the LICENSE file.
 
 		async function run() {
 			console.clear();
-			console.log("test");
-			get_selection();
+			// console.log("test");
+			// get_selection();
 			await go.run(inst);
 			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 		}

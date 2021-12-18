@@ -28,7 +28,7 @@ TODO:
 
 ```bash
 # Makefile commands
-make {build,run,test-bench,profile-bench,clean,clean-binary,clean-perfs}
+make {build build-cmd build-wasm run clean clean-perfs clean-binary test-bench profile-bench}
 ```
 
 ```bash

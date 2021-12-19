@@ -13,7 +13,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Template renderer
 	renderer := &Template{
-		templates: template.Must(template.ParseGlob("public/*.html")),
+		templates: template.Must(template.ParseGlob("/public/*.html")),
 	}
 	router.Renderer = renderer
 

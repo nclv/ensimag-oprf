@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/oprf/go/common"
-
 	"github.com/cloudflare/circl/oprf"
 )
 
@@ -99,7 +97,7 @@ func (c *Client) CreateRequest(inputs [][]byte) (*oprf.ClientRequest, error) {
 }
 
 // EvaluateRequest evaluate a common.EvaluationRequest into an oprf.Evaluation
-func (c *Client) EvaluateRequest(evaluationRequest *common.EvaluationRequest) (*oprf.Evaluation, error) {
+func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) (*oprf.Evaluation, error) {
 	data, err := json.Marshal(&evaluationRequest)
 	if err != nil {
 		log.Println("evaluation request marshalling error :", err)

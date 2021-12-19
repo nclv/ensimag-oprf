@@ -7,10 +7,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/oprf/go/client/core"
-	"github.com/oprf/go/common"
-
 	"github.com/cloudflare/circl/oprf"
+	"github.com/oprf/go/client/core"
 )
 
 var (
@@ -76,7 +74,7 @@ func main() {
 	info := hex.EncodeToString(token)
 	log.Println("Public information : ", info)
 
-	evaluationRequest := common.NewEvaluationRequest(
+	evaluationRequest := core.NewEvaluationRequest(
 		suite, mode, info, clientRequest.BlindedElements(),
 	)
 	evaluation, err := client.EvaluateRequest(evaluationRequest)

@@ -1,4 +1,4 @@
-package common
+package core
 
 import "github.com/cloudflare/circl/oprf"
 

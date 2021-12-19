@@ -3,7 +3,6 @@ package core
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/oprf/go/common"
 	"log"
 	"testing"
 
@@ -12,13 +11,15 @@ import (
 
 func setup(mode oprf.Mode, suite oprf.SuiteID) *Client {
 	client := NewClient("http://localhost:1323")
-	client.SetupOPRFClient(suite, mode)
+	if err := client.SetupOPRFClient(suite, mode); err != nil {
+		return nil
+	}
 
 	return client
 }
 
 func exchange(client *Client, mode oprf.Mode, suite oprf.SuiteID) [][]byte {
-	clientRequest := client.CreateRequest([][]byte{[]byte("dead3eef")})
+	clientRequest, _ := client.CreateRequest([][]byte{[]byte("dead3eef")})
 
 	token := make([]byte, 256)
 	if _, err := rand.Read(token); err != nil {
@@ -30,12 +31,14 @@ func exchange(client *Client, mode oprf.Mode, suite oprf.SuiteID) [][]byte {
 	info := hex.EncodeToString(token)
 	// log.Println("Public information : ", info)
 
-	evaluationRequest := common.NewEvaluationRequest(
+	evaluationRequest := NewEvaluationRequest(
 		suite, mode, info, clientRequest.BlindedElements(),
 	)
-	evaluation := client.EvaluateRequest(evaluationRequest)
+	evaluation, _ := client.EvaluateRequest(evaluationRequest)
 
-	return client.Finalize(clientRequest, evaluation, info)
+	outputs, _ := client.Finalize(clientRequest, evaluation, info)
+
+	return outputs
 }
 
 func benchmarkClient(b *testing.B, mode oprf.Mode, suite oprf.SuiteID) {

@@ -23,7 +23,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Endpoints
 	// router.GET("/", controllers.IndexHandler)
-	// router.File("/", "public/index.html")
+	// router.File("/", "public/main.html")
 
 	oprfServerController := controllers.NewOPRFServerController()
 	oprfServerController.Initialize()

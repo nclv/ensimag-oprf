@@ -15,9 +15,9 @@ type EvaluationRequest struct {
 	BlindedElements []oprf.Blinded `json:"blinded_elements"` // or use []string
 }
 
-// IndexHandler handles the index.html template
+// IndexHandler handles the main.html template
 func IndexHandler(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.html", nil) //nolint:wrapcheck
+	return c.Render(http.StatusOK, "main.html", nil) //nolint:wrapcheck
 }
 
 // GetKeysHandler is an endpoint returning the static keys

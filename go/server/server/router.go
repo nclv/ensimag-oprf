@@ -29,8 +29,8 @@ func NewRouter() (*echo.Echo, error) {
 	oprfServerController := controllers.NewOPRFServerController()
 	oprfServerController.Initialize()
 
-	router.GET("/request_public_keys", oprfServerController.GetKeysHandler)
-	router.POST("/evaluate", oprfServerController.EvaluateHandler)
+	router.GET("/api/request_public_keys", oprfServerController.GetKeysHandler)
+	router.POST("/api/evaluate", oprfServerController.EvaluateHandler)
 
 	// Static files
 	router.Static("/static", "./static")

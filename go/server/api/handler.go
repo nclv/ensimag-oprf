@@ -3,12 +3,10 @@ package api
 import (
 	"log"
 	"net/http"
-
-	"github.com/oprf/go/server/server"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	router, err := server.NewRouter()
+	router, err := NewRouter()
 	if err != nil {
 		log.Println(err)
 

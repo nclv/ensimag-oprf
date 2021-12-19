@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/oprf/go/server/server"
+	"github.com/oprf/go/server/api"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +16,7 @@ const (
 )
 
 func main() {
-	router, err := server.NewRouter()
+	router, err := api.NewRouter()
 	if err != nil {
 		log.Println(err)
 

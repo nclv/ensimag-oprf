@@ -1,18 +1,18 @@
 package api
 
 import (
-	"github.com/ensimag-oprf/go/server/controllers"
-	"github.com/labstack/echo/v4"
+	"github.com/ensimag-oprf/go/server/server"
+	"log"
 	"net/http"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	router := echo.New()
+	router, err := server.NewRouter()
+	if err != nil {
+		log.Println(err)
 
-	oprfServerController := controllers.NewOPRFServerController()
-	oprfServerController.Initialize()
-
-	router.GET("/api/request_public_keys", oprfServerController.GetKeysHandler)
+		return
+	}
 
 	router.ServeHTTP(w, r)
 }

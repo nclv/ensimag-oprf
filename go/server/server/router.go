@@ -22,7 +22,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Template renderer
 	renderer := &Template{
-		templates: template.Must(template.ParseGlob("/vercel/path1/public/*.html")),
+		templates: template.Must(template.ParseGlob("public/*.html")),
 	}
 	router.Renderer = renderer
 

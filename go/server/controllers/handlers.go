@@ -14,7 +14,7 @@ func IndexHandler(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", nil) //nolint:wrapcheck
 }
 
-// GetKeysHandler is an endpoint returning the public keys
+// GetKeysHandler is an endpoint returning the static keys
 func (s *OPRFServerController) GetKeysHandler(c echo.Context) error {
 	s.keysMu.RLock()
 	keys := make(map[oprf.SuiteID][]byte)

@@ -11,7 +11,7 @@ import (
 )
 
 // pseudonymize execute the PseudonimizeRequest and returns the pseudonymized data bytes.
-// It creates the client request, generate the random public information, call the server for
+// It creates the client request, generate the random static information, call the server for
 // an evaluation and finalize the protocol.
 func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 	// Set up the client with the mode and suite
@@ -26,7 +26,7 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 		return nil, fmt.Errorf("couldn't create the request : %w", err)
 	}
 
-	// The public information (client SECRET)
+	// The static information (client SECRET)
 	// It is RECOMMENDED that this metadata be constructed with some type of higher-level
 	// domain separation to avoid cross protocol attacks or related issues.
 	// For example, protocols using this construction might ensure that the metadata uses

@@ -14,7 +14,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Template renderer
 	renderer := &Template{
-		templates: template.Must(template.ParseGlob("templates/*.html")),
+		templates: template.Must(template.ParseGlob("pages/*.html")),
 	}
 	router.Renderer = renderer
 
@@ -34,7 +34,7 @@ func NewRouter() (*echo.Echo, error) {
 	router.POST("/evaluate", oprfServerController.EvaluateHandler)
 
 	// Static files
-	router.Static("/static", "./public")
+	router.Static("/static", "./static")
 
 	return router, nil
 }

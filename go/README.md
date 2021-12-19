@@ -20,7 +20,7 @@ make run
 ### Using cURL
 
 ```bash
-# Get the public keys
+# Get the static keys
 curl -X GET http://localhost:1323/request_public_keys
 ["Aw8w56VYF4ejVfxCWt91AjPzdimuqqONpIkSrO74c4Ga","A9pxkw7jys6VmafHG1bhHOCd0b9nakuxZzHgQmDeiN8DtyemjeinyjtSNxdZPI50dQ==","AwF+WC+bWEBW1GT9wownSD7UokFge1BM7OMXAlzx9KgC4B+HMZxKgHN/FMXm9dmHaYUWXEDk4W13w2xwJGAbu1LmGw=="]
 

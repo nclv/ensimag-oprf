@@ -6,8 +6,8 @@ import (
 	"github.com/cloudflare/circl/oprf"
 )
 
-// NewOPRFClient create an OPRF client with the provided suite, mode and public key.
-// No public key is needed for oprf.BaseMode.
+// NewOPRFClient create an OPRF client with the provided suite, mode and static key.
+// No static key is needed for oprf.BaseMode.
 func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) (*oprf.Client, error) {
 	var (
 		client *oprf.Client
@@ -29,7 +29,7 @@ func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) (*op
 	return client, nil
 }
 
-// DeserializePublicKeys deserialize the server's public keys
+// DeserializePublicKeys deserialize the server's static keys
 func DeserializePublicKeys(serializedPublicKeys map[oprf.SuiteID][]byte) map[oprf.SuiteID]*oprf.PublicKey {
 	publicKeys := make(map[oprf.SuiteID]*oprf.PublicKey)
 

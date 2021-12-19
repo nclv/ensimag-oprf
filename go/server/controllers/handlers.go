@@ -15,11 +15,6 @@ type EvaluationRequest struct {
 	BlindedElements []oprf.Blinded `json:"blinded_elements"` // or use []string
 }
 
-// IndexHandler handles the index.html template
-func IndexHandler(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.html", nil) //nolint:wrapcheck
-}
-
 // GetKeysHandler is an endpoint returning the static keys
 func (s *OPRFServerController) GetKeysHandler(c echo.Context) error {
 	s.keysMu.RLock()
@@ -57,6 +52,7 @@ func (s *OPRFServerController) EvaluateHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "No server")
 	}
 
+	// TODO: send the public key to the client
 	evaluation, err := server.Evaluate(evaluationRequest.BlindedElements, []byte(evaluationRequest.Info))
 	if err != nil || evaluation == nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

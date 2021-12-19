@@ -9,16 +9,10 @@ import (
 func NewRouter() (*echo.Echo, error) {
 	router := echo.New()
 
-	// Template renderer
-	//renderer := &Template{
-	//	templates: template.Must(template.ParseGlob("public/*.html")), // Path issue with vercel
-	//}
-	//router.Renderer = renderer
-
 	// Middlewares
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
-	// router.Use(middleware.Gzip())
+	router.Use(middleware.Gzip())
 	router.Use(middleware.CORS())
 
 	// Endpoints

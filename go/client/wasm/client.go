@@ -43,7 +43,7 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 
 	info := hex.EncodeToString(token)
 	// DO NOT SHARE THE PUBLIC INFORMATION
-	// log.Println("Public information : ", info)
+	log.Println("Public information : ", info)
 
 	evaluationRequest := core.NewEvaluationRequest(
 		request.Suite, request.Mode, info, clientRequest.BlindedElements(),

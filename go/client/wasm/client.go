@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/oprf/go/client/core"
-	"github.com/oprf/go/common"
 )
 
 // pseudonymize execute the PseudonimizeRequest and returns the pseudonymized data bytes.
@@ -46,7 +45,7 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 	// DO NOT SHARE THE PUBLIC INFORMATION
 	// log.Println("Public information : ", info)
 
-	evaluationRequest := common.NewEvaluationRequest(
+	evaluationRequest := core.NewEvaluationRequest(
 		request.Suite, request.Mode, info, clientRequest.BlindedElements(),
 	)
 	evaluation, err := client.EvaluateRequest(evaluationRequest)

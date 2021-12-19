@@ -5,9 +5,15 @@ import (
 
 	"github.com/cloudflare/circl/oprf"
 	"github.com/labstack/echo/v4"
-
-	"github.com/oprf/go/common"
 )
+
+// EvaluationRequest represents an evaluation requests
+type EvaluationRequest struct {
+	Suite           oprf.SuiteID   `json:"suite"`
+	Mode            oprf.Mode      `json:"mode"`
+	Info            string         `json:"info"`
+	BlindedElements []oprf.Blinded `json:"blinded_elements"` // or use []string
+}
 
 // IndexHandler handles the index.html template
 func IndexHandler(c echo.Context) error {
@@ -38,7 +44,7 @@ func (s *OPRFServerController) GetKeysHandler(c echo.Context) error {
 // 127, 32, 157, 20, 86, 131, 22, 159, 225, 197, 38, 118, 154, 158, 71, 70, 50, 188, 116, \
 // 40, 80, 108, 72, 139, 91, 98, 146, 135, 105, 40]]}'
 func (s *OPRFServerController) EvaluateHandler(c echo.Context) error {
-	evaluationRequest := new(common.EvaluationRequest)
+	evaluationRequest := new(EvaluationRequest)
 	if err := c.Bind(evaluationRequest); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

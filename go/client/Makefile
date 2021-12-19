@@ -3,7 +3,7 @@ all: build
 
 BINARY_DIR = ./bin
 PROFILE_DIR = ./perfs
-WASM_DIR = ../server/public
+WASM_DIR = ../server/static
 
 BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP256 \
 	BenchmarkClientBaseModeOPRFP384 BenchmarkClientVerifiableModeOPRFP384 \

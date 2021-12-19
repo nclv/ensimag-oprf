@@ -14,7 +14,7 @@ import (
 // https://about.sourcegraph.com/go/gophercon-2019-get-going-with-webassembly/
 
 // TODO: change the server URL
-const serverURL = "http://localhost:1323"
+const serverURL = "/api"
 
 func main() {
 	log.Println("Go Web Assembly")

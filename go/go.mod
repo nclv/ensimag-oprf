@@ -1,4 +1,4 @@
-module github.com/oprf/go
+module github.com/oprf
 
 go 1.17
 

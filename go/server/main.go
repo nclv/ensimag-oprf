@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/oprf/go/server/api"
+	"github.com/oprf/server/api"
 	"log"
 	"net/http"
 	"os"

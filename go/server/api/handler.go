@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/oprf/go/server/controllers"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/oprf/server/controllers"
 )
 
 type Template struct {

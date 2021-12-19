@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/cloudflare/circl/oprf"
-	"github.com/oprf/go/client/core"
+	"github.com/oprf/client/core"
 )
 
 var (

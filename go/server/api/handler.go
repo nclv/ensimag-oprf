@@ -8,12 +8,14 @@ import (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	log.Println("hello")
 	router, err := server.NewRouter()
 	if err != nil {
 		log.Println(err)
 
 		return
 	}
+	log.Println("router")
 
 	router.ServeHTTP(w, r)
 }

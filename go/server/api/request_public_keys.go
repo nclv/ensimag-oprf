@@ -12,7 +12,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	oprfServerController := controllers.NewOPRFServerController()
 	oprfServerController.Initialize()
 
-	router.GET("/request_public_keys", oprfServerController.GetKeysHandler)
+	router.GET("/api/request_public_keys", oprfServerController.GetKeysHandler)
 
 	router.ServeHTTP(w, r)
 }

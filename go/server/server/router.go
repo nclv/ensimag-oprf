@@ -23,7 +23,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Endpoints
 	// router.GET("/", controllers.IndexHandler)
-	// router.File("/", "public/main.html")
+	router.File("/", "public/index.html")
 
 	oprfServerController := controllers.NewOPRFServerController()
 	oprfServerController.Initialize()
@@ -32,7 +32,7 @@ func NewRouter() (*echo.Echo, error) {
 	router.POST("/api/evaluate", oprfServerController.EvaluateHandler)
 
 	// Static files
-	// router.Static("/static", "./static")
+	router.Static("/static", "./public/static")
 
 	return router, nil
 }

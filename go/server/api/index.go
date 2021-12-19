@@ -14,8 +14,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Remove header")
-	// w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/html,application/json")
 
 	router.ServeHTTP(w, r)
 }

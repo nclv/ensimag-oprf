@@ -11,6 +11,12 @@ The information must be private to avoid non-deterministic results. It needs to 
 make {build,run,load-test,clean}
 ```
 
+### Deployment
+
+On [Vercel](https://vercel.com/nclv/ensimag-oprf).
+
+See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/)
+
 ### Launch the server
 
 ```bash

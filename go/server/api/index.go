@@ -14,7 +14,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html,application/json")
+	// w.Header().Set("Content-Type", "text/html,application/json")
 
 	router.ServeHTTP(w, r)
 }

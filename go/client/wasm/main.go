@@ -7,6 +7,12 @@ import (
 	"syscall/js"
 )
 
+// WASM sources
+// https://golangbot.com/webassembly-using-go/
+// https://ian-says.com/articles/golang-in-the-browser-with-web-assembly/
+// https://github.com/tinygo-org/tinygo/tree/master/src/examples/wasm
+// https://about.sourcegraph.com/go/gophercon-2019-get-going-with-webassembly/
+
 // TODO: change the server URL
 const serverURL = "http://localhost:1323"
 

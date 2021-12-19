@@ -1,12 +1,13 @@
 package main
 
 import (
-	"html/template"
-	"io"
+	"context"
+	"github.com/oprf/go/server/server"
+	"log"
 	"net/http"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"os"
+	"os/signal"
+	"time"
 )
 
 const (
@@ -14,43 +15,31 @@ const (
 	PORT = "1323"
 )
 
-func indexHandler(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.html", nil) //nolint:wrapcheck
-}
-
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data) //nolint:wrapcheck
-}
-
 func main() {
-	// TODO: https://echo.labstack.com/cookbook/auto-tls/
+	router, err := server.NewRouter()
+	if err != nil {
+		log.Println(err)
 
-	serverManager := NewOPRFServerManager()
-	serverManager.Initialize()
-
-	e := echo.New()
-
-	// Template renderer
-	renderer := &Template{
-		templates: template.Must(template.ParseGlob("templates/*.html")),
+		return
 	}
-	e.Renderer = renderer
 
-	// Middlewares
-	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	// Start the server
+	go func() {
+		if err := router.Start(HOST + ":" + PORT); err != nil && err != http.ErrServerClosed {
+			router.Logger.Fatal("shutting down the server")
+		}
+	}()
 
-	// Endpoints
-	e.GET("/", indexHandler)
-	e.GET("/request_public_keys", serverManager.getKeysHandler)
-	e.POST("/evaluate", serverManager.evaluateHandler)
+	// Wait for interrupt signal to gracefully shut down the server with a timeout of 10 seconds.
+	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 
-	// Static files
-	e.Static("/static", "./public")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	e.Logger.Fatal(e.Start(HOST + ":" + PORT))
+	if err := router.Shutdown(ctx); err != nil {
+		router.Logger.Fatal(err)
+	}
 }

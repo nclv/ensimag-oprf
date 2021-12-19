@@ -11,6 +11,8 @@ import (
 	"github.com/ensimag-oprf/go/client/core"
 )
 
+const serverURL = "http://localhost:1323/api"
+
 var (
 	data  []string
 	mode  oprf.Mode
@@ -34,7 +36,7 @@ func main() {
 	log.Println(mode, suite)
 
 	// Set up the OPRF client
-	client := core.NewClient("http://localhost:1323")
+	client := core.NewClient(serverURL)
 	if err := client.SetupOPRFClient(suite, mode); err != nil {
 		return
 	}

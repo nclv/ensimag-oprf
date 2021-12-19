@@ -76,7 +76,7 @@ func ClientServerOPRF(inputs [][]byte, info []byte, client *oprf.Client, server 
 	}
 
 	// Finalize computes the signed token from the server Evaluation and returns the output of the
-	// OPRF protocol. The function uses server's public key to verify the proof in verifiable mode.
+	// OPRF protocol. The function uses server's static key to verify the proof in verifiable mode.
 	// TODO: send the evaluation to the client
 	clientOutputs, err := client.Finalize(clientRequest, evaluation, info)
 	if err != nil || clientOutputs == nil {
@@ -118,12 +118,12 @@ func main() {
 	server := GetServer(suite, mode, privateKey)
 	publicKey := privateKey.Public()
 	// For one server :
-	// TODO: public information generation (https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf#section-5.2)
-	// TODO: send the public key (only for a verifiable protocol ie. 1 or (#{suite} * #{mode}) / 2 public keys)
-	// TODO: send the public information to the client (use always the same information like in the draft test vectors?, 7465737420696e666f)
+	// TODO: static information generation (https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-voprf#section-5.2)
+	// TODO: send the static key (only for a verifiable protocol ie. 1 or (#{suite} * #{mode}) / 2 static keys)
+	// TODO: send the static information to the client (use always the same information like in the draft test vectors?, 7465737420696e666f)
 
 	// On the client
-	// TODO: receive the public keys and the public information
+	// TODO: receive the static keys and the static information
 	// END OF INITIALIZATION
 	// TODO: choose the suite and the mode, send it to the server that choose the right instance
 	client := GetClient(suite, mode, publicKey)
@@ -131,7 +131,7 @@ func main() {
 	ServerSideOPRF([]byte("hello world"), []byte("test info"), server)
 	// In the base mode, a client and server interact to
 	// compute output = F(skS, input, info), where input is the client's
-	// private input, skS is the server's private key, info is the public
+	// private input, skS is the server's private key, info is the static
 	// input (or metadata), and output is the POPRF output.  The client
 	// learns output and the server learns nothing.  In the verifiable mode,
 	// the client also receives proof that the server used skS in computing

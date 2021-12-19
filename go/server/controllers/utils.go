@@ -17,7 +17,7 @@ func GeneratePrivateKey(suite oprf.SuiteID) *oprf.PrivateKey {
 	return privateKey
 }
 
-// SerializePublicKey is a wrapper to serialize a public key
+// SerializePublicKey is a wrapper to serialize a static key
 func SerializePublicKey(key *oprf.PrivateKey) []byte {
 	publicKey, err := key.Public().Serialize()
 	if err != nil {

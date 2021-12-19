@@ -57,7 +57,7 @@ func main() {
 		return
 	}
 
-	// The public information
+	// The static information
 	// It is RECOMMENDED that this metadata be constructed with some type of higher-level
 	// domain separation to avoid cross protocol attacks or related issues.
 	// For example, protocols using this construction might ensure that the metadata uses

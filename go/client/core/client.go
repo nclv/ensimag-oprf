@@ -32,11 +32,11 @@ func NewClient(serverURL string) *Client {
 	}
 }
 
-// SetupOPRFClient retrieve the server's public keys and create the OPRF client.
+// SetupOPRFClient retrieve the server's static keys and create the OPRF client.
 func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	serializedPublicKeys, err := c.GetPublicKeys()
 	if err != nil {
-		log.Println("error when getting the public keys")
+		log.Println("error when getting the static keys")
 
 		return err
 	}
@@ -57,7 +57,7 @@ func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	return nil
 }
 
-// GetPublicKeys returns the public keys from the server
+// GetPublicKeys returns the static keys from the server
 func (c *Client) GetPublicKeys() (map[oprf.SuiteID][]byte, error) {
 	req, err := http.NewRequest("GET", c.serverURL+PublicKeysEndpoint, nil)
 	if err != nil {
@@ -136,7 +136,7 @@ func (c *Client) EvaluateRequest(evaluationRequest *common.EvaluationRequest) (*
 }
 
 // Finalize computes the signed token from the server Evaluation and returns the output of the
-// OPRF protocol. The function uses server's public key to verify the proof in verifiable mode.
+// OPRF protocol. The function uses server's static key to verify the proof in verifiable mode.
 func (c *Client) Finalize(clientRequest *oprf.ClientRequest,
 	evaluation *oprf.Evaluation, info string) ([][]byte, error) {
 	clientOutputs, err := c.oprfClient.Finalize(clientRequest, evaluation, []byte(info))

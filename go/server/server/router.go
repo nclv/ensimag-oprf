@@ -18,7 +18,7 @@ func NewRouter() (*echo.Echo, error) {
 	// Middlewares
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
-	router.Use(middleware.Gzip())
+	// router.Use(middleware.Gzip())
 	router.Use(middleware.CORS())
 
 	// Endpoints

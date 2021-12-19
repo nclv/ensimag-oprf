@@ -15,7 +15,7 @@ make {build,run,load-test,clean}
 
 On [Vercel](https://vercel.com/nclv/ensimag-oprf).
 
-See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/)
+See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/), [CDN caching](https://vercel.com/docs/concepts/edge-network/caching)
 
 ### Launch the server
 

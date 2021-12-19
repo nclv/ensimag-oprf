@@ -1,4 +1,4 @@
-module github.com/oprf
+module github.com/ensimag-oprf/go
 
 go 1.17
 

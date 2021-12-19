@@ -6,9 +6,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ensimag-oprf/go/server/controllers"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/oprf/server/controllers"
 )
 
 type Template struct {

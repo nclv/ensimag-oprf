@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/oprf/server/api"
+	"github.com/ensimag-oprf/go/server/api"
 	"log"
 	"net/http"
 	"os"

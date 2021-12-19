@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/oprf/client/core"
+	"github.com/ensimag-oprf/go/client/core"
 )
 
 // pseudonymize execute the PseudonimizeRequest and returns the pseudonymized data bytes.

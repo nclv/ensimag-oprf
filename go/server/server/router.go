@@ -11,7 +11,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Template renderer
 	//renderer := &Template{
-	//	templates: template.Must(template.ParseGlob("public/*.html")),
+	//	templates: template.Must(template.ParseGlob("public/*.html")), // Path issue with vercel
 	//}
 	//router.Renderer = renderer
 

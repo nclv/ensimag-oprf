@@ -139,7 +139,7 @@ func (c *Client) Finalize(clientRequest *oprf.ClientRequest,
 	evaluation *oprf.Evaluation, info string) ([][]byte, error) {
 	clientOutputs, err := c.oprfClient.Finalize(clientRequest, evaluation, []byte(info))
 	if err != nil || clientOutputs == nil {
-		log.Println("Finalize error :", err, clientOutputs)
+		log.Println("Finalize error :", err, clientOutputs, clientRequest, evaluation)
 
 		return nil, fmt.Errorf("finalize error : %w", err)
 	}

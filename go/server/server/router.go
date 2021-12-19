@@ -14,7 +14,7 @@ func NewRouter() (*echo.Echo, error) {
 
 	// Template renderer
 	renderer := &Template{
-		templates: template.Must(template.ParseGlob("pages/*.html")),
+		templates: template.Must(template.ParseGlob("public/*.html")),
 	}
 	router.Renderer = renderer
 

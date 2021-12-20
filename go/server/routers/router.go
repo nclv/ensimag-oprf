@@ -1,4 +1,4 @@
-package server
+package routers
 
 import (
 	"github.com/ensimag-oprf/go/server/controllers"

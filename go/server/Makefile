@@ -5,15 +5,15 @@ BINARY_DIR = ./bin
 PROFILE_DIR = ./perfs
 
 run:
-	go run .
+	go run ./cmd
 
 build:
-	go build -o ${BINARY_DIR}/server .
+	go build -o ${BINARY_DIR}/server ./cmd
 
 load-test:
 	ali --body-file=${PROFILE_DIR}/evaluate.json \
 		--rate=500 --duration=10s \
-		-H 'Content-Type: application/json' --method=POST http://127.0.0.1:1323/evaluate
+		-H 'Content-Type: application/json' --method=POST http://127.0.0.1:1323/api/evaluate
 
 clean:
 	go clean

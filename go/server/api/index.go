@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/ensimag-oprf/go/server/server"
 	"log"
 	"net/http"
+
+	"github.com/ensimag-oprf/go/server"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

@@ -30,7 +30,24 @@ func NewClient(serverURL string) *Client {
 	}
 }
 
-// SetupOPRFClient retrieve the server's static keys and create the OPRF client.
+// SetOPRFClientPublicKey update the OPRF client to use the provided public key.
+// The public key is only needed for the verifiable mode so this method does nothing in base mode.
+func (c *Client) SetOPRFClientPublicKey(publicKey *oprf.PublicKey) error {
+	if c.oprfClient.Mode == oprf.VerifiableMode {
+		oprfClient, err := oprf.NewVerifiableClient(c.oprfClient.SuiteID, publicKey)
+		if err != nil {
+			log.Println("error when setting OPRF client public key", err)
+
+			return err
+		}
+
+		c.oprfClient = oprfClient
+	}
+
+	return nil
+}
+
+// SetupOPRFClient retrieve the server's public keys and create the OPRF client.
 func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	serializedPublicKeys, err := c.GetPublicKeys()
 	if err != nil {
@@ -39,11 +56,17 @@ func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 		return err
 	}
 
-	publicKeys := DeserializePublicKeys(serializedPublicKeys)
+	publicKeys, err := DeserializePublicKeys(serializedPublicKeys)
+	if err != nil {
+		log.Println("couldn't deserialize public keys :", err)
+
+		return fmt.Errorf("couldn't deserialize public keys")
+	}
 
 	c.publicKeys = publicKeys
+	publicKey := publicKeys[suite]
 
-	oprfClient, err := NewOPRFClient(suite, mode, publicKeys[suite])
+	oprfClient, err := NewOPRFClient(suite, mode, publicKey)
 	if err != nil {
 		log.Println("error when setting up the OPRF client")
 
@@ -55,7 +78,7 @@ func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	return nil
 }
 
-// GetPublicKeys returns the static keys from the server
+// GetPublicKeys returns the public keys from the server
 func (c *Client) GetPublicKeys() (map[oprf.SuiteID][]byte, error) {
 	req, err := http.NewRequest("GET", c.serverURL+PublicKeysEndpoint, nil)
 	if err != nil {
@@ -96,8 +119,8 @@ func (c *Client) CreateRequest(inputs [][]byte) (*oprf.ClientRequest, error) {
 	return clientRequest, nil
 }
 
-// EvaluateRequest evaluate a common.EvaluationRequest into an oprf.Evaluation
-func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) (*oprf.Evaluation, error) {
+// EvaluateRequest evaluate an EvaluationRequest into an EvaluationResponse
+func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) (*EvaluationResponse, error) {
 	data, err := json.Marshal(&evaluationRequest)
 	if err != nil {
 		log.Println("evaluation request marshalling error :", err)
@@ -123,14 +146,14 @@ func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) (*oprf.Ev
 	}
 	defer resp.Body.Close()
 
-	var evaluation oprf.Evaluation
-	if err = json.NewDecoder(resp.Body).Decode(&evaluation); err != nil {
+	var evaluationResponse EvaluationResponse
+	if err = json.NewDecoder(resp.Body).Decode(&evaluationResponse); err != nil {
 		log.Println("JSON decoder error :", err)
 
 		return nil, fmt.Errorf("JSON decoder error : %w", err)
 	}
 
-	return &evaluation, nil
+	return &evaluationResponse, nil
 }
 
 // Finalize computes the signed token from the server Evaluation and returns the output of the
@@ -139,7 +162,7 @@ func (c *Client) Finalize(clientRequest *oprf.ClientRequest,
 	evaluation *oprf.Evaluation, info string) ([][]byte, error) {
 	clientOutputs, err := c.oprfClient.Finalize(clientRequest, evaluation, []byte(info))
 	if err != nil || clientOutputs == nil {
-		log.Println("Finalize error :", err, clientOutputs, clientRequest, evaluation)
+		log.Println("Finalize error :", err, clientOutputs)
 
 		return nil, fmt.Errorf("finalize error : %w", err)
 	}

@@ -43,28 +43,32 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 
 	info := hex.EncodeToString(token)
 	// DO NOT SHARE THE PUBLIC INFORMATION
-	log.Println("Public information : ", info)
+	// log.Println("Public information : ", info)
 
+	// Evaluate the request
 	evaluationRequest := core.NewEvaluationRequest(
 		request.Suite, request.Mode, info, clientRequest.BlindedElements(),
 	)
-	evaluation, err := client.EvaluateRequest(evaluationRequest)
+	evaluationResponse, err := client.EvaluateRequest(evaluationRequest)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't evaluate the request : %w", err)
 	}
 
-	//for _, element := range evaluation.Elements {
-	//	log.Println("Evaluation : ", base64.StdEncoding.EncodeToString(element))
-	//}
+	// Deserialize the public key
+	publicKey, err := core.DeserializePublicKey(request.Suite, evaluationResponse.SerializedPublicKey)
+	if err != nil {
+		return nil, fmt.Errorf("coudn't deserialize the public key : %w", err)
+	}
+	// Set the public key on the client
+	if err := client.SetOPRFClientPublicKey(publicKey); err != nil {
+		return nil, fmt.Errorf("coudn't update the client's public key : %w", err)
+	}
 
-	outputs, err := client.Finalize(clientRequest, evaluation, info)
+	// Finalize the protocol
+	outputs, err := client.Finalize(clientRequest, evaluationResponse.Evaluation, info)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't finalize the request : %w", err)
 	}
-
-	//for _, output := range outputs {
-	//	log.Println("Output : ", base64.StdEncoding.EncodeToString(output))
-	//}
 
 	return outputs, nil
 }

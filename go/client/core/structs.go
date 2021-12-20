@@ -19,3 +19,10 @@ func NewEvaluationRequest(suite oprf.SuiteID, mode oprf.Mode, info string,
 		BlindedElements: blindedElements,
 	}
 }
+
+// EvaluationResponse contains the oprf.Evaluation and the serialized public key that will be used for the
+// finalization.
+type EvaluationResponse struct {
+	Evaluation          *oprf.Evaluation `json:"evaluation"`
+	SerializedPublicKey []byte           `json:"serialized_public_key"`
+}

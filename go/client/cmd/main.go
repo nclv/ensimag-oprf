@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/cloudflare/circl/oprf"
+
 	"github.com/ensimag-oprf/go/client/core"
 )
 
@@ -79,16 +80,27 @@ func main() {
 	evaluationRequest := core.NewEvaluationRequest(
 		suite, mode, info, clientRequest.BlindedElements(),
 	)
-	evaluation, err := client.EvaluateRequest(evaluationRequest)
+	evaluationResponse, err := client.EvaluateRequest(evaluationRequest)
 	if err != nil {
 		return
 	}
 
-	for _, element := range evaluation.Elements {
+	// Deserialize the public key
+	publicKey, err := core.DeserializePublicKey(suite, evaluationResponse.SerializedPublicKey)
+	if err != nil {
+		return
+	}
+	// Set the public key on the client
+	if err := client.SetOPRFClientPublicKey(publicKey); err != nil {
+		return
+	}
+
+	for _, element := range evaluationResponse.Evaluation.Elements {
 		log.Println("Evaluation : ", base64.StdEncoding.EncodeToString(element))
 	}
 
-	outputs, err := client.Finalize(clientRequest, evaluation, info)
+	// Finalize the OPRF protocol
+	outputs, err := client.Finalize(clientRequest, evaluationResponse.Evaluation, info)
 	if err != nil {
 		return
 	}

@@ -68,7 +68,7 @@ func wrapper() js.Func {
 				log.Println(encodedOutputs)
 
 				// map[string]interface{} is parsed by js.ValueOf and put into a javascript Object
-				data := map[string]interface{}{"encoded outputs": encodedOutputs}
+				data := map[string]interface{}{"pseudonymized_data": encodedOutputs}
 				objectConstructor := js.Global().Get("Object")
 				dataJS := objectConstructor.New(data)
 

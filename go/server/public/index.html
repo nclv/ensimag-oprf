@@ -9,6 +9,7 @@ license that can be found in the LICENSE file.
 <head>
 	<meta charset="utf-8">
 	<title>Go wasm</title>
+	<link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
@@ -37,61 +38,95 @@ license that can be found in the LICENSE file.
 			console.error(err);
 		});
 
+		// run the WASM client code
 		async function run() {
 			console.clear();
-			// console.log("test");
-			// get_selection();
+			console.log("Running the WASM");
+
 			await go.run(inst);
 			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 		}
 
-		function get_selection() {
-			let info = {}
-			document.getElementsByName("suite").forEach((i)=>{if(i.checked) { info["suite"] = i.value }})
-			document.getElementsByName("mode").forEach((i)=>{if(i.checked) { info["mode"] = i.value }})
-			console.log(info)
-		}
-
+		// pseudonymize the JSON input
 		async function AsyncPseudonymize(jsonInput) {
 			try {
-				const objectOutput = await pseudonymize(jsonInput)
-				console.log(objectOutput)
-				// const reader = response.body.getReader()
-				// let done = false
-				// while (!done) {
-				// 	const read = await reader.read()
-				//	done = read && read.done
-				//	console.log('Read', read.value.length, 'bytes')
-				// }
+				const objectOutput = await pseudonymize(jsonInput);
+				console.log(objectOutput);
+
+				return objectOutput;
 			} catch (err) {
-				console.error('Caught exception', err)
+				console.error('Caught exception', err);
 			}
 		}
+
+		async function handleFormSubmit(event) {
+			// load the pseudonymize function
+			run();
+
+			console.log("Form submitted");
+			event.preventDefault();
+
+			const formData = new FormData(event.target);
+			const formObject = Object.fromEntries(formData.entries());
+
+			formObject["mode"] = parseInt(formObject["mode"]);
+			formObject["suite"] = parseInt(formObject["suite"]);
+			formObject["data"] = formObject["data"].split(";");
+
+			const objectOutputs = await AsyncPseudonymize(JSON.stringify(formObject));
+
+			const results = document.querySelector('.results pre');
+			results.innerText = JSON.stringify(objectOutputs, null, 4);
+		}
+
+		const load = () => {
+        	const form = document.querySelector('.pseudonymization-form');
+			form.addEventListener('submit', (event) => handleFormSubmit(event));
+		}
+		window.onload = load;
 	</script>
 
-	<h1>Pseudonymization service</h1>
-	<form id="pseudonymization">
-		<label for="data">Data to pseudonymize :</label><br>
-		<input type="text" id="data" />
+	<section class="pseudonymization-form">
+		<h1>Pseudonymization service</h1>
+		<p>Use this service to pseudonymize some data.</p>
 
-		<p>OPRF mode (Base or Verifiable) :</p><br>
-		<label for="base-mode">Base mode</label>
-		<input type="radio" id="base-mode" name="mode" value="0"/><br>
-		<label for="verifiable-mode">Verifiable mode</label>
-		<input type="radio" id="verifiable-mode" name="mode" value="1"/><br>
+		<form>
+			<div class="input-group">
+				<p>OPRF mode (Base or Verifiable) :</p>
 
-		<p>OPRF cipher suite (P256, P384 or P521) :</p><br>
-		<label for="p256">P256</label>
-		<input type="radio" id="p256" name="suite" value="3"/><br>
-		<label for="p384">P384</label>
-		<input type="radio" id="p384" name="suite" value="4"/><br>
-		<label for="p521">P521</label>
-		<input type="radio" id="p521" name="suite" value="5"/><br>
+				<label class="inline" for="base-mode">Base mode</label>
+				<input type="radio" id="base-mode" name="mode" value=0/>
 
-		<label for="output">Result :</label><br>
-		<input type="text" id="output" readonly /><br>
-	</form>
-	<button onClick="run();" id="runButton" disabled>Run</button>
+				<label class="inline" for="verifiable-mode">Verifiable mode</label>
+				<input type="radio" id="verifiable-mode" name="mode" value="1"/>
+			</div>
+
+			<div class="input-group">
+				<p>OPRF cipher suite (P256, P384 or P521) :</p>
+
+				<label class="inline" for="p256">P256</label>
+				<input type="radio" id="p256" name="suite" value="3"/>
+
+				<label class="inline" for="p384">P384</label>
+				<input type="radio" id="p384" name="suite" value="4"/>
+
+				<label class="inline" for="p521">P521</label>
+				<input type="radio" id="p521" name="suite" value="5"/>
+			</div>
+
+			<div class="input-group">
+				<label for="data"><strong>Data to pseudonymize</strong> separated by `;`</label>
+				<textarea id="data" name="data" rows="6" cols="65"></textarea>
+			</div>
+
+			<button type="submit" id="runButton" disabled>Send It!</button>
+		</form>
+	</section>
+
+	<div class="results">
+		<h2>Pseudonymized data</h2>
+		<pre></pre>
+	</div>
 </body>
 
 </html>

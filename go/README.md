@@ -17,7 +17,7 @@ On [Vercel](https://vercel.com/nclv/ensimag-oprf).
 
 See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/), [CDN caching](https://vercel.com/docs/concepts/edge-network/caching).
 
-Issue when doing the finalization because of the [architecture](https://vercel.com/docs/concepts/functions/conceptual-model). The public key change at each request so the evaluation returned by the server correspond to a different public key that the key queried from `/api/request_public_keys`. The public key is not used when generating a request or blinding the inputs so we could send the public key with the response of `/api/evaluate`. We only need to have the correct suiteID (chosen by the client) when initializing the client. 
+Issue when doing the finalization because of the [architecture](https://vercel.com/docs/concepts/functions/conceptual-model). The public key change at each request so the evaluation returned by the server correspond to a different public key that the key queried from `/api/request_public_keys`. The public key is not used when generating a request or blinding the inputs, so we could send the public key with the response of `/api/evaluate`. We then update the verifiable client's public key before the finalization. This step is only needed in verifiable mode as no public key is needed for the finalization in base mode.
 
 ---
 

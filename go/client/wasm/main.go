@@ -13,7 +13,6 @@ import (
 // https://github.com/tinygo-org/tinygo/tree/master/src/examples/wasm
 // https://about.sourcegraph.com/go/gophercon-2019-get-going-with-webassembly/
 
-// TODO: change the server URL
 const serverURL = "/api"
 
 func main() {

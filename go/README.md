@@ -15,9 +15,21 @@ make {build,run,load-test,clean}
 
 On [Vercel](https://vercel.com/nclv/ensimag-oprf).
 
-See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/), [CDN caching](https://vercel.com/docs/concepts/edge-network/caching)
+See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/), [CDN caching](https://vercel.com/docs/concepts/edge-network/caching).
 
 Issue when doing the finalization because of the [architecture](https://vercel.com/docs/concepts/functions/conceptual-model). The public key change at each request so the evaluation returned by the server correspond to a different public key that the key queried from `/api/request_public_keys`. The public key is not used when generating a request or blinding the inputs so we could send the public key with the response of `/api/evaluate`. We only need to have the correct suiteID (chosen by the client) when initializing the client. 
+
+---
+
+Project settings on _vercel.com_ :
+- Set the root directory to `go/server/`,
+- Do not override any command. The output directory is by default `server/public`. It contains the pages and static files.
+
+`vercel.json` parameters :
+- `"cleanUrls": true` : all HTML files and Serverless Functions will have their extension removed. When visiting a path that ends with the extension, a 308 response will redirect the client to the extensionless path. Similarly, a Serverless Function named `api/index.go` will be served when visiting `/api/index`. Visiting `/api/index.go` will redirect to `/api/index`.
+- `"trailingSlash": false` : visiting a path that ends with a forward slash will respond with a 308 status code and redirect to the path without the trailing slash. For example, the `/api/` path will redirect to `/api`. 
+- The response header of all the Serverless Functions in `/api` is `Content-Type : application/json`.
+- The rewrite `"source": "/api/(.*)", "destination": "/api"` redirects all requests to `/api/*` to `/api` i.e. to `/api/index.go` Serverless Function. In this function we instantiate the router that serves all the `/api` endpoints.
 
 ### Launch the server
 
@@ -41,7 +53,7 @@ curl -X POST http://localhost:1323/api/evaluate -H 'Content-Type: application/js
 ```
 
 ### Load testing
-`/evaluate` endpoint load testing with `ali` :
+`/api/evaluate` endpoint load testing with `ali` :
 
 ```bash
 make load-test
@@ -49,7 +61,7 @@ make load-test
 
 ## Client
 
-The client is composed of a CLI for command-line interaction with the server (`/cmd` directory). The WASM binary is generated from the code into `/wasm` to the `/server/public` directory.
+The client is composed of a CLI for command-line interaction with the server (`/cmd` directory). The WASM binary is generated from the code into `/wasm` to the `/server/public/static` directory.
 
 ```bash
 # Makefile commands

@@ -29,8 +29,20 @@ func NewOPRFClient(suite oprf.SuiteID, mode oprf.Mode, pkS *oprf.PublicKey) (*op
 	return client, nil
 }
 
-// DeserializePublicKeys deserialize the server's static keys
-func DeserializePublicKeys(serializedPublicKeys map[oprf.SuiteID][]byte) map[oprf.SuiteID]*oprf.PublicKey {
+// DeserializePublicKey deserialize a public key
+func DeserializePublicKey(suiteID oprf.SuiteID, serializedPublicKey []byte) (*oprf.PublicKey, error) {
+	publicKey := new(oprf.PublicKey)
+	if err := publicKey.Deserialize(suiteID, serializedPublicKey); err != nil {
+		log.Println(err)
+
+		return nil, err
+	}
+
+	return publicKey, nil
+}
+
+// DeserializePublicKeys deserialize the server's public keys
+func DeserializePublicKeys(serializedPublicKeys map[oprf.SuiteID][]byte) (map[oprf.SuiteID]*oprf.PublicKey, error) {
 	publicKeys := make(map[oprf.SuiteID]*oprf.PublicKey)
 
 	for suiteID, serializedPublicKey := range serializedPublicKeys {
@@ -39,13 +51,13 @@ func DeserializePublicKeys(serializedPublicKeys map[oprf.SuiteID][]byte) map[opr
 		//	", Public key : ", base64.StdEncoding.EncodeToString(serializedPublicKey),
 		// )
 
-		publicKey := new(oprf.PublicKey)
-		if err := publicKey.Deserialize(suiteID, serializedPublicKey); err != nil {
-			log.Println(err)
+		publicKey, err := DeserializePublicKey(suiteID, serializedPublicKey)
+		if err != nil {
+			return nil, err
 		}
 
 		publicKeys[suiteID] = publicKey
 	}
 
-	return publicKeys
+	return publicKeys, nil
 }

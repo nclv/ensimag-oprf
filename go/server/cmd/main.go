@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/ensimag-oprf/go/server/server"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/ensimag-oprf/go/server"
 )
 
 const (

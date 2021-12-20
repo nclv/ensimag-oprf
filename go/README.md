@@ -65,7 +65,7 @@ The client is composed of a CLI for command-line interaction with the server (`/
 
 ---
 
-The client frontend may lag if we spam the _Send_ button. The error `scheduleTimeoutEvent: missed timeout event` is thrown from `wasm_exec.js`. There is a bug on the second _Send_ after reloading the page. The WASM client doesn't seem to load. The fix for both issues is to do not reset the WASM instance.
+The client frontend may lag if we spam the _Send_ button. The error `scheduleTimeoutEvent: missed timeout event` is thrown from `wasm_exec.js`. There is a bug on the second _Send_ after reloading the page. The WASM client doesn't seem to load. The fix for both issues is to load the wasm instance only once.
 
 ```bash
 # Makefile commands

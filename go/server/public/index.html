@@ -47,7 +47,8 @@ license that can be found in the LICENSE file.
 			console.log("Running the WASM");
 
 			await go.run(inst);
-			// inst = WebAssembly.instantiate(mod, go.importObject); // reset instance
+			// can be set but not needed
+			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 		}
 
 		// pseudonymize the JSON input

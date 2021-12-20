@@ -7,7 +7,7 @@ import (
 	"syscall/js"
 )
 
-// wrapper returns a javascript promise that pseudonimize an array of JSON input.
+// wrapper returns a javascript promise that pseudonymize an array of JSON input.
 // https://withblue.ink/2020/10/03/go-webassembly-http-requests-and-promises.html
 func wrapper() js.Func {
 	return js.FuncOf(func(this js.Value, args []js.Value) interface{} {

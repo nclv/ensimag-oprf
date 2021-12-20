@@ -32,8 +32,11 @@ license that can be found in the LICENSE file.
 		WebAssembly.instantiateStreaming(fetch("/static/client.wasm"), go.importObject).then((result) => {
 			mod = result.module;
 			inst = result.instance;
-			// Activate the button on wasm file load
+			// activate the button on wasm file load
 			document.getElementById("runButton").disabled = false;
+		}).then(() => {
+			// load the pseudonymize function
+			run();
 		}).catch((err) => {
 			console.error(err);
 		});
@@ -44,7 +47,7 @@ license that can be found in the LICENSE file.
 			console.log("Running the WASM");
 
 			await go.run(inst);
-			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+			// inst = WebAssembly.instantiate(mod, go.importObject); // reset instance
 		}
 
 		// pseudonymize the JSON input
@@ -60,9 +63,6 @@ license that can be found in the LICENSE file.
 		}
 
 		async function handleFormSubmit(event) {
-			// load the pseudonymize function
-			run();
-
 			console.log("Form submitted");
 			event.preventDefault();
 

@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/ensimag-oprf/go/server/routers"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/ensimag-oprf/go/server"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 )
 
 func main() {
-	router, err := server.NewRouter()
+	router, err := routers.NewRouter()
 	if err != nil {
 		log.Println(err)
 

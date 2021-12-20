@@ -1,14 +1,13 @@
 package api
 
 import (
+	"github.com/ensimag-oprf/go/server/routers"
 	"log"
 	"net/http"
-
-	"github.com/ensimag-oprf/go/server"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	router, err := server.NewRouter()
+	router, err := routers.NewRouter()
 	if err != nil {
 		log.Println(err)
 

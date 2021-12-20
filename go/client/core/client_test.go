@@ -36,7 +36,7 @@ func exchange(client *Client, mode oprf.Mode, suite oprf.SuiteID) [][]byte {
 	)
 	evaluation, _ := client.EvaluateRequest(evaluationRequest)
 
-	outputs, _ := client.Finalize(clientRequest, evaluation, info)
+	outputs, _ := client.Finalize(clientRequest, evaluation.Evaluation, info)
 
 	return outputs
 }

@@ -1,10 +1,13 @@
-.PHONY: all clean run build load-test
+.PHONY: all clean run-server run-key-gen build load-test
 all: build
 
 BINARY_DIR = ./bin
 PROFILE_DIR = ./perfs
 
-run:
+run-key-gen:
+	go run ./key-gen
+
+run-server:
 	go run ./cmd
 
 build:

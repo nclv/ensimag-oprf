@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter() (*echo.Echo, error) {
+func NewRouter(serializedBase64KeyMap controllers.SerializedBase64KeyMap) (*echo.Echo, error) {
 	router := echo.New()
 
 	// Middlewares
@@ -20,7 +20,9 @@ func NewRouter() (*echo.Echo, error) {
 	router.File("/", "public/index.html")
 
 	oprfServerController := controllers.NewOPRFServerController()
-	oprfServerController.Initialize()
+	if err := oprfServerController.Initialize(serializedBase64KeyMap); err != nil {
+		return nil, err
+	}
 
 	router.GET("/api/request_public_keys", oprfServerController.GetKeysHandler)
 	router.POST("/api/evaluate", oprfServerController.EvaluateHandler)

@@ -2,19 +2,40 @@ package controllers
 
 import (
 	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"log"
 
 	"github.com/cloudflare/circl/oprf"
 )
 
 // GeneratePrivateKey generate a private key for the encryption suite
-func GeneratePrivateKey(suite oprf.SuiteID) *oprf.PrivateKey {
+func GeneratePrivateKey(suite oprf.SuiteID) (*oprf.PrivateKey, error) {
 	privateKey, err := oprf.GenerateKey(suite, rand.Reader)
 	if err != nil {
 		log.Println(err)
+
+		return nil, err
 	}
 
-	return privateKey
+	return privateKey, nil
+}
+
+// LoadPrivateKey decode the base64 serialized private key and deserialized it.
+func LoadPrivateKey(suiteID oprf.SuiteID, serializedBase64Key string) (*oprf.PrivateKey, error) {
+	serializedKey, err := base64.StdEncoding.DecodeString(serializedBase64Key)
+	if err != nil {
+		log.Println(err)
+
+		return nil, fmt.Errorf("couldn't load the private key : %w", err)
+	}
+
+	privateKey, err := DeserializePrivateKey(suiteID, serializedKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return privateKey, nil
 }
 
 // SerializePublicKey is a wrapper to serialize a public key
@@ -27,8 +48,20 @@ func SerializePublicKey(key *oprf.PrivateKey) []byte {
 	return publicKey
 }
 
+// DeserializePrivateKey deserialize a private key
+func DeserializePrivateKey(suiteID oprf.SuiteID, serializedPrivateKey []byte) (*oprf.PrivateKey, error) {
+	privateKey := new(oprf.PrivateKey)
+	if err := privateKey.Deserialize(suiteID, serializedPrivateKey); err != nil {
+		log.Println(err)
+
+		return nil, err
+	}
+
+	return privateKey, nil
+}
+
 // NewOPRFServer create an OPRF server with the provided suite, mode and private key
-func NewOPRFServer(suite oprf.SuiteID, mode oprf.Mode, privateKey *oprf.PrivateKey) *oprf.Server {
+func NewOPRFServer(suite oprf.SuiteID, mode oprf.Mode, privateKey *oprf.PrivateKey) (*oprf.Server, error) {
 	var (
 		server *oprf.Server
 		err    error
@@ -42,7 +75,9 @@ func NewOPRFServer(suite oprf.SuiteID, mode oprf.Mode, privateKey *oprf.PrivateK
 
 	if err != nil {
 		log.Println(err)
+
+		return nil, err
 	}
 
-	return server
+	return server, nil
 }

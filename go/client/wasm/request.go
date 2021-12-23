@@ -8,16 +8,18 @@ import (
 
 // WrappedPseudonimizeRequest allows to partially parse the JSON input
 type WrappedPseudonimizeRequest struct {
-	Data  []json.RawMessage `json:"data"`
-	Mode  oprf.Mode         `json:"mode"`
-	Suite oprf.SuiteID      `json:"suite"`
+	Data       []json.RawMessage `json:"data"`
+	Mode       oprf.Mode         `json:"mode"`
+	Suite      oprf.SuiteID      `json:"suite"`
+	ReturnInfo bool              `json:"return-info"`
 }
 
 // PseudonimizeRequest holds the data and the client setup parameters.
 type PseudonimizeRequest struct {
-	Data  [][]byte     `json:"data"`
-	Mode  oprf.Mode    `json:"mode"`
-	Suite oprf.SuiteID `json:"suite"`
+	Data       [][]byte     `json:"data"`
+	Mode       oprf.Mode    `json:"mode"`
+	Suite      oprf.SuiteID `json:"suite"`
+	ReturnInfo bool         `json:"return-info"`
 }
 
 // ValidateMode validates the client mode (Base or Verifiable).
@@ -60,6 +62,7 @@ func (p *PseudonimizeRequest) UnmarshalJSON(data []byte) error {
 
 	p.Suite = wp.Suite
 	p.Mode = wp.Mode
+	p.ReturnInfo = wp.ReturnInfo
 
 	return nil
 }

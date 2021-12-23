@@ -23,8 +23,8 @@ func wrapper() js.Func {
 			reject := args[1]
 
 			// Parse the JSON request
-			var pseudonimizeRequest PseudonimizeRequest
-			if err := json.Unmarshal([]byte(jsonInput), &pseudonimizeRequest); err != nil {
+			var request PseudonimizeRequest
+			if err := json.Unmarshal([]byte(jsonInput), &request); err != nil {
 				log.Println("JSON unmarshalling error :", err, jsonInput)
 				rejectPromise(reject, err)
 
@@ -32,24 +32,24 @@ func wrapper() js.Func {
 			}
 
 			// Validate the OPRF mode
-			if err := pseudonimizeRequest.ValidateMode(); err != nil {
+			if err := request.ValidateMode(); err != nil {
 				log.Println(err)
 				rejectPromise(reject, err)
 
 				return nil
 			}
 			// Validate the encryption suite
-			if err := pseudonimizeRequest.ValidateSuite(); err != nil {
+			if err := request.ValidateSuite(); err != nil {
 				log.Println(err)
 				rejectPromise(reject, err)
 
 				return nil
 			}
 
-			log.Println(pseudonimizeRequest)
+			log.Println(request)
 
 			go func() {
-				outputs, err := pseudonymize(&pseudonimizeRequest)
+				response, err := pseudonymize(&request)
 				if err != nil {
 					log.Println("pseudonymization error")
 					rejectPromise(reject, err)
@@ -57,11 +57,11 @@ func wrapper() js.Func {
 					return
 				}
 
-				log.Println(outputs)
+				log.Println(response.Outputs)
 
 				// Encode the [][]byte outputs to []string
-				encodedOutputs := make([]interface{}, len(outputs))
-				for index, output := range outputs {
+				encodedOutputs := make([]interface{}, len(response.Outputs))
+				for index, output := range response.Outputs {
 					encodedOutputs[index] = base64.StdEncoding.EncodeToString(output)
 				}
 
@@ -69,6 +69,10 @@ func wrapper() js.Func {
 
 				// map[string]interface{} is parsed by js.ValueOf and put into a javascript Object
 				data := map[string]interface{}{"pseudonymized_data": encodedOutputs}
+				if request.ReturnInfo {
+					data["info"] = response.Info
+				}
+
 				objectConstructor := js.Global().Get("Object")
 				dataJS := objectConstructor.New(data)
 

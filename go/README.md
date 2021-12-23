@@ -17,7 +17,18 @@ On [Vercel](https://vercel.com/nclv/ensimag-oprf).
 
 See [the vercel.json configuration file](https://vercel.com/docs/cli#project-configuration/), [CDN caching](https://vercel.com/docs/concepts/edge-network/caching).
 
-Issue when doing the finalization because of the [architecture](https://vercel.com/docs/concepts/functions/conceptual-model). The public key change at each request so the evaluation returned by the server correspond to a different public key that the key queried from `/api/request_public_keys`. The public key is not used when generating a request or blinding the inputs, so we could send the public key with the response of `/api/evaluate`. We then update the verifiable client's public key before the finalization. This step is only needed in verifiable mode as no public key is needed for the finalization in base mode.
+**Centralized vs. decentralized**
+
+Issue when doing the finalization because of the [architecture](https://vercel.com/docs/concepts/functions/conceptual-model). The private/public key pair changes at each request so the evaluation returned by the server correspond to a different public key that the key queried from `/api/request_public_keys`. The public key is not used when generating a request or blinding the inputs, so we could send the public key with the response of `/api/evaluate`. We then update the verifiable client's public key before the finalization. This step is only needed in verifiable mode as no public key is needed for the finalization in base mode.
+
+The public key is only used client-side for the verifiable mode finalization step. However, because of the serverless architecture of the deployed solution, the private key changes at each request. A consequence is that the outputs will always be non-deterministic, event if the public information is fixed. Moreover, we can't associate the input data (d) to the pseudonymized data (p) for the resolution i.e. do Resolve(p) -> d.
+A solution would be to share the private key as a common secret. See [storing complex secrets](https://github.com/vercel/vercel/issues/749). The user could do the resolution providing the knowledge of its input data and the public information, mode and suite used when generating the pseudonymized data by sending an evaluation request to the server. Note that the server's private key should be the same one used when doing the pseudonimization. The user would also be able to retrieve the list of pseudonyms associated to the same input data by providing the input data and the list of public information used to generate the pseudonyms. The resolution with pseudonym requires to store all the public informations.
+
+If the public information is fixed the protocol is deterministic. It is trivial to recover the pseudonyms corresponding to some input data.
+
+---
+
+There are no issues with the keys if we use a centralized server.
 
 ---
 

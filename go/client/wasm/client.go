@@ -9,10 +9,16 @@ import (
 	"github.com/ensimag-oprf/go/client/core"
 )
 
-// pseudonymize execute the PseudonimizeRequest and returns the pseudonymized data bytes.
+// PseudonymizeResponse contains the pseudonymized data output and the public information if requested.
+type PseudonymizeResponse struct {
+	Outputs [][]byte
+	Info    string
+}
+
+// pseudonymize execute the PseudonimizeRequest and returns the PseudonymizedResponse.
 // It creates the client request, generate the random static information, call the server for
 // an evaluation and finalize the protocol.
-func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
+func pseudonymize(request *PseudonimizeRequest) (*PseudonymizeResponse, error) {
 	// Set up the client with the mode and suite
 	client := core.NewClient(serverURL)
 	if err := client.SetupOPRFClient(request.Suite, request.Mode); err != nil {
@@ -70,5 +76,11 @@ func pseudonymize(request *PseudonimizeRequest) ([][]byte, error) {
 		return nil, fmt.Errorf("couldn't finalize the request : %w", err)
 	}
 
-	return outputs, nil
+	// Build the response
+	response := &PseudonymizeResponse{Outputs: outputs}
+	if request.ReturnInfo {
+		response.Info = info
+	}
+
+	return response, nil
 }

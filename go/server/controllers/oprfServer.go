@@ -58,50 +58,25 @@ func (s *OPRFServerController) setKeys(privateKeyMap KeyMap) {
 func (s *OPRFServerController) getPrivateKeys(serializedBase64KeyMap SerializedBase64KeyMap) (KeyMap, error) {
 	privateKeyMap := make(KeyMap)
 
-	p256PrivateKey, err := s.loadOrGenerateKey(oprf.OPRFP256, serializedBase64KeyMap)
+	p256PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP256, serializedBase64KeyMap)
 	if err != nil {
 		return nil, err
 	}
 	privateKeyMap[oprf.OPRFP256] = p256PrivateKey
 
-	p384PrivateKey, err := s.loadOrGenerateKey(oprf.OPRFP384, serializedBase64KeyMap)
+	p384PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP384, serializedBase64KeyMap)
 	if err != nil {
 		return nil, err
 	}
 	privateKeyMap[oprf.OPRFP384] = p384PrivateKey
 
-	p521PrivateKey, err := s.loadOrGenerateKey(oprf.OPRFP521, serializedBase64KeyMap)
+	p521PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP521, serializedBase64KeyMap)
 	if err != nil {
 		return nil, err
 	}
 	privateKeyMap[oprf.OPRFP521] = p521PrivateKey
 
 	return privateKeyMap, nil
-}
-
-// loadOrGenerateKey tries to load the key from SerializedBase64KeyMap. If there is no entry for the
-// provided cipher suite the key is generated.
-func (s *OPRFServerController) loadOrGenerateKey(suite oprf.SuiteID,
-	serializedBase64KeyMap SerializedBase64KeyMap) (*oprf.PrivateKey, error) {
-	var (
-		privateKey *oprf.PrivateKey
-		err        error
-	)
-
-	serializedBase64Key, ok := serializedBase64KeyMap[suite]
-	if ok {
-		privateKey, err = LoadPrivateKey(suite, serializedBase64Key)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		privateKey, err = GeneratePrivateKey(suite)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return privateKey, nil
 }
 
 // createServersSuite create the base and verifiable servers for a provided encryption suite.

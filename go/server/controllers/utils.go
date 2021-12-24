@@ -38,6 +38,31 @@ func LoadPrivateKey(suiteID oprf.SuiteID, serializedBase64Key string) (*oprf.Pri
 	return privateKey, nil
 }
 
+// LoadOrGenerateKey tries to load the key from SerializedBase64KeyMap. If there is no entry for the
+// provided cipher suite the key is generated.
+func LoadOrGenerateKey(suite oprf.SuiteID,
+	serializedBase64KeyMap SerializedBase64KeyMap) (*oprf.PrivateKey, error) {
+	var (
+		privateKey *oprf.PrivateKey
+		err        error
+	)
+
+	serializedBase64Key, ok := serializedBase64KeyMap[suite]
+	if ok {
+		privateKey, err = LoadPrivateKey(suite, serializedBase64Key)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		privateKey, err = GeneratePrivateKey(suite)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return privateKey, nil
+}
+
 // SerializePublicKey is a wrapper to serialize a public key
 func SerializePublicKey(key *oprf.PrivateKey) []byte {
 	publicKey, err := key.Public().Serialize()

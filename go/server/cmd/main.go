@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/cloudflare/circl/oprf"
-	"github.com/ensimag-oprf/go/server/controllers"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/ensimag-oprf/go/server/controllers"
 	"github.com/ensimag-oprf/go/server/routers"
 )
 
@@ -18,30 +17,8 @@ const (
 	PORT = "1323"
 )
 
-// loadPrivateKeysFromEnv load the base64 serialized private keys from the environment variables.
-func loadPrivateKeysFromEnv() controllers.SerializedBase64KeyMap {
-	serializedBase64KeyMap := make(controllers.SerializedBase64KeyMap)
-
-	serializedBase64P256PrivateKey, ok := os.LookupEnv("P256_PRIVATE_KEY")
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP256] = serializedBase64P256PrivateKey
-	}
-
-	serializedBase64P384PrivateKey, ok := os.LookupEnv("P384_PRIVATE_KEY")
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP384] = serializedBase64P384PrivateKey
-	}
-
-	serializedBase64P521PrivateKey, ok := os.LookupEnv("P521_PRIVATE_KEY")
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP521] = serializedBase64P521PrivateKey
-	}
-
-	return serializedBase64KeyMap
-}
-
 func main() {
-	serializedBase64KeyMap := loadPrivateKeysFromEnv()
+	serializedBase64KeyMap := controllers.LoadPrivateKeysFromEnv()
 
 	router, err := routers.NewRouter(serializedBase64KeyMap)
 	if err != nil {

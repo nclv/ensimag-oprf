@@ -1,13 +1,17 @@
 package api
 
 import (
-	"github.com/ensimag-oprf/go/server/routers"
 	"log"
 	"net/http"
+
+	"github.com/ensimag-oprf/go/server/controllers"
+	"github.com/ensimag-oprf/go/server/routers"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	router, err := routers.NewRouter()
+	serializedBase64KeyMap := controllers.LoadPrivateKeysFromEnv()
+
+	router, err := routers.NewRouter(serializedBase64KeyMap)
 	if err != nil {
 		log.Println(err)
 

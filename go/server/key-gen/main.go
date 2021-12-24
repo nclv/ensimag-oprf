@@ -25,7 +25,7 @@ func commandLine() {
 func main() {
 	commandLine()
 
-	log.Println(suite)
+	log.Println("Suite :", suite)
 
 	// Generate and serialize the private key
 	privateKey, err := controllers.GeneratePrivateKey(suite)
@@ -43,5 +43,5 @@ func main() {
 	}
 
 	// Show the base64 encoded key
-	log.Println(base64.StdEncoding.EncodeToString(serializedKey))
+	log.Println("Base64 encode private key :", base64.StdEncoding.EncodeToString(serializedKey))
 }

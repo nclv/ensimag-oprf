@@ -48,6 +48,11 @@ Project settings on _vercel.com_ :
 - The response header of all the Serverless Functions in `/api` is `Content-Type : application/json`.
 - The rewrite `"source": "/api/(.*)", "destination": "/api"` redirects all requests to `/api/*` to `/api` i.e. to `/api/index.go` Serverless Function. In this function we instantiate the router that serves all the `/api` endpoints.
 
+---
+
+- Performance tests with [PageSpeed](https://pagespeed.web.dev/report?url=https%3A%2F%2Fensimag-oprf.vercel.app%2F),
+- Security tests with [Security Headers](https://securityheaders.com/?q=https%3A%2F%2Fensimag-oprf.vercel.app).
+
 ### Launch the server
 
 ```bash

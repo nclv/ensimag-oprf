@@ -16,7 +16,7 @@ func NewRouter(serializedBase64KeyMap controllers.SerializedBase64KeyMap) (*echo
 	router.Use(middleware.Recover())
 	router.Use(middleware.Gzip())
 	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://ensimag-oprf.vercel.app"},
+		AllowOrigins: []string{"https://ensimag-oprf.vercel.app", "https://ensimag-oprf-nclv.vercel.app"},
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
 

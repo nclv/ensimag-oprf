@@ -15,6 +15,10 @@
       "source": "/(.*)",
       "headers" : [
         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://ensimag-oprf.vercel.app"
+        },
+        {
           "key" : "X-Content-Type-Options",
           "value" : "nosniff"
         },
@@ -32,7 +36,7 @@
         },
         {
           "key" : "Permissions-Policy",
-          "value" : "geolocation=(self), microphone=()"
+          "value" : "geolocation=(self), microphone=(), camera=()"
         }
       ]
     }

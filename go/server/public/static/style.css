@@ -28,6 +28,10 @@ body {
     line-height: 1.45;
 }
 
+footer {
+    text-align: center;
+}
+
 /* Headings use a different font because they’re hipsters. */
 h1,
 h2 {

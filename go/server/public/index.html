@@ -8,7 +8,31 @@ license that can be found in the LICENSE file.
 
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--
+	  Allows control over where resources are loaded from.
+	  Place as early in the <head> as possible, as the tag
+	  only applies to resources that are declared after it.
+	-->
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+
+	<meta name="description" content="Pseudonymize your data without sharing it to our server.">
+
+	<!-- Control the behavior of search engine crawling and indexing -->
+	<meta name="robots" content="index,follow"> <!-- All Search Engines -->
+
+	<meta property="og:url" content="https://ensimag-oprf.vercel.app/">
+	<!--<meta property="og:title" content="">-->
+	<meta property="og:type" content="website">
+	<meta property="og:description" content="Pseudonymize your data without sharing it to our server.">
+	<!--<meta property="og:image" content="https://html5boilerplate.com/icon.png">-->
+
 	<title>Pseudonymization service</title>
+
+	<link rel="preload" href="/static/style.css" as="style">
+	<link rel="preload" href="/static/wasm_exec.js" as="script">
+	<link rel="preload" href="/static/form.js" as="script">
+
 	<link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -18,7 +42,6 @@ license that can be found in the LICENSE file.
 	<script src="https://cdn.jsdelivr.net/npm/text-encoding@0.7.0/lib/encoding.min.js"></script>
 	(see https://caniuse.com/#feat=textencoder)
 	-->
-	<script src="/static/wasm_exec.js"></script>
 
 	<section class="pseudonymization-form">
 		<h1>Pseudonymization service</h1>
@@ -55,7 +78,7 @@ license that can be found in the LICENSE file.
 			</div>
 
 			<div class="input-group">
-				<label for="return-info">Check to return the public information :</label>
+				<label class="inline" for="return-info">Check to return the public information :</label>
 				<input type="checkbox" id="return-info" name="return-info" value="true">
 			</div>
 
@@ -73,7 +96,12 @@ license that can be found in the LICENSE file.
 		<pre></pre>
 	</div>
 
-	<script src="/static/form.js"></script>
+	<script src="/static/wasm_exec.js" defer></script>
+	<script src="/static/form.js" defer></script>
+
+	<footer>
+		<small>&copy; Copyright 2022, ensimag-oprf</small>
+	</footer>
 </body>
 
 </html>

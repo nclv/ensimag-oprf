@@ -1,8 +1,9 @@
 package routers
 
 import (
-	"github.com/ensimag-oprf/go/server/controllers"
 	"net/http"
+
+	"github.com/ensimag-oprf/go/server/controllers"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,8 +17,9 @@ func NewRouter(serializedBase64KeyMap controllers.SerializedBase64KeyMap) (*echo
 	router.Use(middleware.Recover())
 	router.Use(middleware.Gzip())
 	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://ensimag-oprf.vercel.app", "https://ensimag-oprf-nclv.vercel.app"},
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowOrigins:     []string{"https://ensimag-oprf.vercel.app", "https://ensimag-oprf-nclv.vercel.app"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowCredentials: true,
 	}))
 
 	// Endpoints

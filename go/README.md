@@ -18,7 +18,7 @@ Some notes about the protocol :
 
 We provide :
 - a [public API](https://ensimag-oprf.vercel.app/) to perform the evaluation with our server's secret key,
-- a website that performs the full protocol : [ensimag-oprf.vercel.app](https://ensimag-oprf.vercel.app/) or [ensimag-oprf-nclv.vercel.app](ensimag-oprf-nclv.vercel.app),
+- a website that performs the full protocol : [ensimag-oprf.vercel.app](https://ensimag-oprf.vercel.app/) or [ensimag-oprf-nclv.vercel.app](https://ensimag-oprf-nclv.vercel.app),
 - a command-line tool to generate the private keys for the supported ciphersuites,
 - a local client to test the full protocol with a specific server and selected mode, ciphersuite and public information,
 - a local server to test the full protocol with a specific client and selected or random secret keys.

@@ -19,6 +19,7 @@ build-cmd:
 
 build-wasm:
 	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o ${WASM_DIR}/client.wasm ./wasm
+	wasm-opt -O3 -o ${WASM_DIR}/client.wasm ${WASM_DIR}/client.wasm
 
 test-bench:
 	go test -bench .

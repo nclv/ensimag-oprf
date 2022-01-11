@@ -7,7 +7,7 @@ This repository contains the implementation of a simple pseudonymization service
 From the draft:
 > An Oblivious Pseudorandom Function (OPRF) is a two-party protocol between client and server for computing the output of a Pseudorandom Function (PRF). The server provides the PRF secret key, and the client provides the PRF input. At the end of the protocol, **the client learns the PRF output without learning anything about the PRF secret key, and the server learns neither the PRF input nor output**. A Partially-Oblivious PRF (POPRF) is an OPRF that allows client and server to provide public input to the PRF. OPRFs and POPRFs can also satisfy a notion of 'verifiability'. In this setting, clients can verify that the server used a specific private key during the execution of the protocol.
 
-The choosen implementation of the draft supports the **base** and **verifiable** modes, and uses multiplicative blinding (see [multiplicative-vs-additive-blinding](https://github.com/bytemare/voprf#multiplicative-vs-additive-blinding)). The supported ciphersuites are (P-256, SHA-256), (P-384, SHA-384) and (P-515, SHA-512).
+The choosen implementation of the draft supports the **base** and **verifiable** modes, and uses multiplicative blinding (see [multiplicative-vs-additive-blinding](https://github.com/bytemare/voprf#multiplicative-vs-additive-blinding)). The supported ciphersuites are (P-256, SHA-256), (P-384, SHA-384) and (P-512, SHA-512).
 
 ---
 

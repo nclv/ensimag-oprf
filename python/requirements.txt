@@ -6,7 +6,7 @@ cffi==1.14.6
 charset-normalizer==2.0.8
 click==8.0.3
 fe25519==1.0.0
-Flask==2.0.2
+Flask==2.3.2
 fountains==1.1.1
 ge25519==1.0.0
 idna==3.3

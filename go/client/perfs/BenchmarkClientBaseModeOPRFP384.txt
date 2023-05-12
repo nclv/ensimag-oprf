@@ -1,11 +1,6 @@
-goos: linux
-goarch: amd64
-pkg: github.com/oprf/go/client
-cpu: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz
-BenchmarkClientBaseModeOPRFP384-4   	     799	   1473237 ns/op	   44803 B/op	     602 allocs/op
-BenchmarkClientBaseModeOPRFP384-4   	     806	   1497117 ns/op	   44772 B/op	     602 allocs/op
-BenchmarkClientBaseModeOPRFP384-4   	     801	   1504911 ns/op	   44837 B/op	     603 allocs/op
-BenchmarkClientBaseModeOPRFP384-4   	     800	   1496823 ns/op	   44763 B/op	     602 allocs/op
-BenchmarkClientBaseModeOPRFP384-4   	     795	   1496573 ns/op	   44789 B/op	     602 allocs/op
-PASS
-ok  	github.com/oprf/go/client	6.933s
+2023/05/12 16:51:12 HTTP Do : Get "http://localhost:1323/api/request_public_keys": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2023/05/12 16:51:12 error when getting the static keys
+2023/05/12 16:51:12 HTTP Do error : Get "http://localhost:1323/api/request_public_keys": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+exit status 1
+FAIL	github.com/ensimag-oprf/go/client/core	15.018s
+FAIL

@@ -1,0 +1,6 @@
+2023/05/12 16:52:28 HTTP Do : Get "http://localhost:1323/api/request_public_keys": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2023/05/12 16:52:28 error when getting the static keys
+2023/05/12 16:52:28 HTTP Do error : Get "http://localhost:1323/api/request_public_keys": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+exit status 1
+FAIL	github.com/ensimag-oprf/go/client/core	15.018s
+FAIL

@@ -1,0 +1,4 @@
+perfs/cpuprofile*
+perfs/memprofile*
+perfs/trace*
+core.test

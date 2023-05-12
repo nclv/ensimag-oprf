@@ -5,9 +5,9 @@ BINARY_DIR = ./bin
 PROFILE_DIR = ./perfs
 WASM_DIR = ../server/public/static
 
-BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP256 \
-	BenchmarkClientBaseModeOPRFP384 BenchmarkClientVerifiableModeOPRFP384 \
-	BenchmarkClientBaseModeOPRFP521 BenchmarkClientVerifiableModeOPRF521
+BENCHMARKS = BenchmarkClientBaseModeOPRFP256 BenchmarkClientVerifiableModeOPRFP256 BenchmarkClientPartiallyObliviousModeOPRFP256 \
+	BenchmarkClientBaseModeOPRFP384 BenchmarkClientVerifiableModeOPRFP384 BenchmarkClientPartiallyObliviousModeOPRFP384 \
+	BenchmarkClientBaseModeOPRFP521 BenchmarkClientVerifiableModeOPRFP521 BenchmarkClientPartiallyObliviousModeOPRFP521
 
 run:
 	go run ./cmd
@@ -22,13 +22,13 @@ build-wasm:
 	wasm-opt -O3 -o ${WASM_DIR}/client.wasm ${WASM_DIR}/client.wasm
 
 test-bench:
-	go test -bench .
+	go test -bench ./core
 
 profile-bench:
 	go install golang.org/x/perf/cmd/benchstat@latest
 
 	$(foreach bench,$(BENCHMARKS), \
-		go test -bench=$(bench) -count 5 -benchmem \
+		go test -bench=$(bench) ./core -count 5 -benchmem \
 			-memprofile ${PROFILE_DIR}/memprofile_$(bench).pprof \
 			-cpuprofile ${PROFILE_DIR}/cpuprofile_$(bench).pprof \
 			-trace=${PROFILE_DIR}/trace_$(bench).pprof \

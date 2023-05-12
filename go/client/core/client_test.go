@@ -88,7 +88,7 @@ func BenchmarkClientBaseModeOPRFP521(b *testing.B) {
 	benchmarkClient(b, oprf.BaseMode, oprf.SuiteP521)
 }
 
-func BenchmarkClientVerifiableModeOPRF521(b *testing.B) {
+func BenchmarkClientVerifiableModeOPRFP521(b *testing.B) {
 	benchmarkClient(b, oprf.VerifiableMode, oprf.SuiteP521)
 }
 

@@ -12,23 +12,24 @@ const (
 	EnvP521PrivateKey = "P521_PRIVATE_KEY"
 )
 
+func GetEnvPrivateKeySuiteMap() map[string]string {
+	return map[string]string{
+		EnvP256PrivateKey: oprf.SuiteP256.Identifier(),
+		EnvP384PrivateKey: oprf.SuiteP384.Identifier(),
+		EnvP521PrivateKey: oprf.SuiteP521.Identifier(),
+	}
+}
+
 // LoadPrivateKeysFromEnv load the base64 serialized private keys from the environment variables.
 func LoadPrivateKeysFromEnv() SerializedBase64KeyMap {
 	serializedBase64KeyMap := make(SerializedBase64KeyMap)
+	envPrivateKeySuiteMap := GetEnvPrivateKeySuiteMap()
 
-	serializedBase64P256PrivateKey, ok := os.LookupEnv(EnvP256PrivateKey)
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP256] = serializedBase64P256PrivateKey
-	}
-
-	serializedBase64P384PrivateKey, ok := os.LookupEnv(EnvP384PrivateKey)
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP384] = serializedBase64P384PrivateKey
-	}
-
-	serializedBase64P521PrivateKey, ok := os.LookupEnv(EnvP521PrivateKey)
-	if ok {
-		serializedBase64KeyMap[oprf.OPRFP521] = serializedBase64P521PrivateKey
+	for envPrivateKey, suiteID := range envPrivateKeySuiteMap {
+		serializedBase64PrivateKey, ok := os.LookupEnv(envPrivateKey)
+		if ok {
+			serializedBase64KeyMap[suiteID] = serializedBase64PrivateKey
+		}
 	}
 
 	return serializedBase64KeyMap

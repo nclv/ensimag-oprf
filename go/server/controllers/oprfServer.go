@@ -7,120 +7,114 @@ import (
 )
 
 type (
-	SerializedBase64KeyMap map[oprf.SuiteID]string
-	KeyMap                 map[oprf.SuiteID]*oprf.PrivateKey
-	ServerMap              map[oprf.Mode]map[oprf.SuiteID]*oprf.Server
+	// suite:base64 private key
+	SerializedBase64KeyMap map[string]string
+	// suite:private key
+	KeyMap map[string]*oprf.PrivateKey
+	// mode:suite:server
+	ServerMap map[oprf.Mode]map[string]Server
 )
 
+type Server interface {
+	Evaluate(req *oprf.EvaluationRequest, info []byte) (*oprf.Evaluation, error)
+	FullEvaluate(input, info []byte) (output []byte, err error)
+	VerifyFinalize(input, info, expectedOutput []byte) bool
+	Suite() oprf.Suite
+}
+
+type BaseServer struct {
+	oprf.Server
+	suite oprf.Suite
+}
+
+func (s BaseServer) Suite() oprf.Suite {
+	return s.suite
+}
+
+func (s BaseServer) Evaluate(req *oprf.EvaluationRequest, _ []byte) (*oprf.Evaluation, error) {
+	return s.Server.Evaluate(req)
+}
+
+func (s BaseServer) FullEvaluate(input, _ []byte) ([]byte, error) {
+	return s.Server.FullEvaluate(input)
+}
+
+func (s BaseServer) VerifyFinalize(input, _, expectedOutput []byte) bool {
+	return s.Server.VerifyFinalize(input, expectedOutput)
+}
+
+type VerifiableServer struct {
+	oprf.VerifiableServer
+	suite oprf.Suite
+}
+
+func (s VerifiableServer) Suite() oprf.Suite {
+	return s.suite
+}
+
+func (s VerifiableServer) Evaluate(req *oprf.EvaluationRequest, _ []byte) (*oprf.Evaluation, error) {
+	return s.VerifiableServer.Evaluate(req)
+}
+
+func (s VerifiableServer) FullEvaluate(input, _ []byte) ([]byte, error) {
+	return s.VerifiableServer.FullEvaluate(input)
+}
+
+func (s VerifiableServer) VerifyFinalize(input, _, expectedOutput []byte) bool {
+	return s.VerifiableServer.VerifyFinalize(input, expectedOutput)
+}
+
+type PartialObliviousServer struct {
+	oprf.PartialObliviousServer
+	suite oprf.Suite
+}
+
+func (s PartialObliviousServer) Suite() oprf.Suite {
+	return s.suite
+}
+
+// OPRFServerController holds the private keys and the servers
 type OPRFServerController struct {
-	// Private keys
-	keys   KeyMap
-	keysMu sync.RWMutex
-	// Base and verifiable servers for the allowed encryption suites
+	keys      KeyMap
 	servers   ServerMap
+	keysMu    sync.RWMutex
 	serversMu sync.RWMutex
 }
 
 func NewOPRFServerController() *OPRFServerController {
-	return &OPRFServerController{ //nolint:exhaustivestruct
+	controller := &OPRFServerController{ //nolint:exhaustivestruct
 		keys:    make(KeyMap),
 		servers: make(ServerMap),
 	}
+	controller.servers[oprf.BaseMode] = make(map[string]Server)
+	controller.servers[oprf.VerifiableMode] = make(map[string]Server)
+	controller.servers[oprf.PartialObliviousMode] = make(map[string]Server)
+
+	return controller
 }
 
 // Initialize generate private keys and initialize the encryption's suite servers
 func (s *OPRFServerController) Initialize(serializedBase64KeyMap SerializedBase64KeyMap) error {
-	// get the private key map
-	privateKeyMap, err := s.getPrivateKeys(serializedBase64KeyMap)
-	if err != nil {
-		return err
+	suites := []oprf.Suite{oprf.SuiteP256, oprf.SuiteP384, oprf.SuiteP521}
+	for _, suite := range suites {
+		suiteID := suite.Identifier()
+
+		privateKey, err := LoadOrGenerateKey(suite, serializedBase64KeyMap)
+		if err != nil {
+			return err
+		}
+
+		s.keys[suiteID] = privateKey
+
+		// create the base and verifiable servers for a provided encryption suite.
+		baseModeServer := oprf.NewServer(suite, privateKey)
+		verifiableModeServer := oprf.NewVerifiableServer(suite, privateKey)
+		partialObliviousModeServer := oprf.NewPartialObliviousServer(suite, privateKey)
+
+		s.servers[oprf.BaseMode][suiteID] = BaseServer{baseModeServer, suite}
+		s.servers[oprf.VerifiableMode][suiteID] = VerifiableServer{verifiableModeServer, suite}
+		s.servers[oprf.PartialObliviousMode][suiteID] = PartialObliviousServer{partialObliviousModeServer, suite}
 	}
-	// set the keys
-	s.setKeys(privateKeyMap)
-
-	// initialize the servers with the private keys
-	if err := s.initializeServers(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *OPRFServerController) setKeys(privateKeyMap KeyMap) {
-	s.keysMu.Lock()
-	s.keys[oprf.OPRFP256] = privateKeyMap[oprf.OPRFP256]
-	s.keys[oprf.OPRFP384] = privateKeyMap[oprf.OPRFP384]
-	s.keys[oprf.OPRFP521] = privateKeyMap[oprf.OPRFP521]
-	s.keysMu.Unlock()
-}
-
-// getPrivateKeys return the private key map
-func (s *OPRFServerController) getPrivateKeys(serializedBase64KeyMap SerializedBase64KeyMap) (KeyMap, error) {
-	privateKeyMap := make(KeyMap)
-
-	p256PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP256, serializedBase64KeyMap)
-	if err != nil {
-		return nil, err
-	}
-	privateKeyMap[oprf.OPRFP256] = p256PrivateKey
-
-	p384PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP384, serializedBase64KeyMap)
-	if err != nil {
-		return nil, err
-	}
-	privateKeyMap[oprf.OPRFP384] = p384PrivateKey
-
-	p521PrivateKey, err := LoadOrGenerateKey(oprf.OPRFP521, serializedBase64KeyMap)
-	if err != nil {
-		return nil, err
-	}
-	privateKeyMap[oprf.OPRFP521] = p521PrivateKey
-
-	return privateKeyMap, nil
-}
-
-// createServersSuite create the base and verifiable servers for a provided encryption suite.
-func (s *OPRFServerController) createServersSuite(suite oprf.SuiteID) error {
-	s.keysMu.RLock()
-	privateKey := s.keys[suite]
-	s.keysMu.RUnlock()
-
-	baseModeServer, err := NewOPRFServer(suite, oprf.BaseMode, privateKey)
-	if err != nil {
-		return err
-	}
-
-	verifiableModeServer, err := NewOPRFServer(suite, oprf.VerifiableMode, privateKey)
-	if err != nil {
-		return err
-	}
-
-	s.servers[oprf.BaseMode][suite] = baseModeServer
-	s.servers[oprf.VerifiableMode][suite] = verifiableModeServer
-
-	return nil
-}
-
-// initializeServers initialize the servers for the allowed encryption suite
-func (s *OPRFServerController) initializeServers() error {
-	s.serversMu.Lock()
-	// Create the nested sub-maps
-	s.servers[oprf.BaseMode] = make(map[oprf.SuiteID]*oprf.Server)
-	s.servers[oprf.VerifiableMode] = make(map[oprf.SuiteID]*oprf.Server)
-
-	if err := s.createServersSuite(oprf.OPRFP256); err != nil {
-		return err
-	}
-
-	if err := s.createServersSuite(oprf.OPRFP384); err != nil {
-		return err
-	}
-
-	if err := s.createServersSuite(oprf.OPRFP521); err != nil {
-		return err
-	}
-
-	s.serversMu.Unlock()
 
 	return nil
 }

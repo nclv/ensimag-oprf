@@ -6,27 +6,30 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/cloudflare/circl/oprf"
 	"github.com/ensimag-oprf/go/client/core"
 )
 
 // PseudonymizeResponse contains the pseudonymized data output and the public information if requested.
 type PseudonymizeResponse struct {
-	Outputs [][]byte
 	Info    string
+	Outputs [][]byte
 }
 
 // pseudonymize execute the PseudonimizeRequest and returns the PseudonymizedResponse.
 // It creates the client request, generate the random static information, call the server for
 // an evaluation and finalize the protocol.
 func pseudonymize(request *PseudonimizeRequest) (*PseudonymizeResponse, error) {
-	// Set up the client with the mode and suite
-	client := core.NewClient(serverURL)
-	if err := client.SetupOPRFClient(request.Suite, request.Mode); err != nil {
-		return nil, fmt.Errorf("couldn't setup OPRF client : %w", err)
+	suite, err := oprf.GetSuite(request.Suite)
+	if err != nil {
+		return nil, fmt.Errorf("the suite is not suppported : %w", err)
 	}
 
+	// Set up the client with the mode and suite
+	client := core.NewClient(serverURL, suite, request.Mode)
+
 	// Request of pseudonymization
-	clientRequest, err := client.CreateRequest(request.Data)
+	finalizeData, oprfEvaluationRequest, err := client.Blind(request.Data)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create the request : %w", err)
 	}
@@ -51,27 +54,33 @@ func pseudonymize(request *PseudonimizeRequest) (*PseudonymizeResponse, error) {
 	// DO NOT SHARE THE PUBLIC INFORMATION
 	// log.Println("Public information : ", info)
 
+	blindedElements, err := core.SerializeElements(oprfEvaluationRequest.Elements)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Evaluate the request
 	evaluationRequest := core.NewEvaluationRequest(
-		request.Suite, request.Mode, info, clientRequest.BlindedElements(),
+		suite, request.Mode, info, blindedElements,
 	)
+
 	evaluationResponse, err := client.EvaluateRequest(evaluationRequest)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't evaluate the request : %w", err)
 	}
 
 	// Deserialize the public key
-	publicKey, err := core.DeserializePublicKey(request.Suite, evaluationResponse.SerializedPublicKey)
-	if err != nil {
-		return nil, fmt.Errorf("coudn't deserialize the public key : %w", err)
-	}
-	// Set the public key on the client
-	if err := client.SetOPRFClientPublicKey(publicKey); err != nil {
-		return nil, fmt.Errorf("coudn't update the client's public key : %w", err)
-	}
+	// publicKey, err := core.DeserializePublicKey(request.Suite, evaluationResponse.SerializedPublicKey)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("coudn't deserialize the public key : %w", err)
+	// }
+	// // Set the public key on the client
+	// if err := client.SetOPRFClientPublicKey(publicKey); err != nil {
+	// 	return nil, fmt.Errorf("coudn't update the client's public key : %w", err)
+	// }
 
 	// Finalize the protocol
-	outputs, err := client.Finalize(clientRequest, evaluationResponse.Evaluation, info)
+	outputs, err := client.Finalize(finalizeData, evaluationResponse.Evaluation, info)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't finalize the request : %w", err)
 	}

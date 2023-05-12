@@ -9,17 +9,12 @@ import (
 	"github.com/cloudflare/circl/oprf"
 )
 
-func setup(mode oprf.Mode, suite oprf.SuiteID) *Client {
-	client := NewClient("http://localhost:1323")
-	if err := client.SetupOPRFClient(suite, mode); err != nil {
-		return nil
-	}
-
-	return client
+func setup(mode oprf.Mode, suite oprf.Suite) *Client {
+	return NewClient("http://localhost:1323/api", suite, mode)
 }
 
-func exchange(client *Client, mode oprf.Mode, suite oprf.SuiteID) [][]byte {
-	clientRequest, _ := client.CreateRequest([][]byte{[]byte("dead3eef")})
+func exchange(client *Client, mode oprf.Mode, suite oprf.Suite) [][]byte {
+	finalizeData, oprfEvaluationRequest, _ := client.Blind([][]byte{[]byte("dead3eef")})
 
 	token := make([]byte, 256)
 	if _, err := rand.Read(token); err != nil {
@@ -31,17 +26,29 @@ func exchange(client *Client, mode oprf.Mode, suite oprf.SuiteID) [][]byte {
 	info := hex.EncodeToString(token)
 	// log.Println("Public information : ", info)
 
-	evaluationRequest := NewEvaluationRequest(
-		suite, mode, info, clientRequest.BlindedElements(),
-	)
-	evaluation, _ := client.EvaluateRequest(evaluationRequest)
+	blindedElements, err := SerializeElements(oprfEvaluationRequest.Elements)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	outputs, _ := client.Finalize(clientRequest, evaluation.Evaluation, info)
+	evaluationRequest := NewEvaluationRequest(
+		suite, mode, info, blindedElements,
+	)
+
+	evaluation, err := client.EvaluateRequest(evaluationRequest)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	outputs, err := client.Finalize(finalizeData, evaluation.Evaluation, info)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return outputs
 }
 
-func benchmarkClient(b *testing.B, mode oprf.Mode, suite oprf.SuiteID) {
+func benchmarkClient(b *testing.B, mode oprf.Mode, suite oprf.Suite) {
 	b.Helper()
 
 	client := setup(mode, suite)
@@ -54,25 +61,37 @@ func benchmarkClient(b *testing.B, mode oprf.Mode, suite oprf.SuiteID) {
 }
 
 func BenchmarkClientBaseModeOPRFP256(b *testing.B) {
-	benchmarkClient(b, oprf.BaseMode, oprf.OPRFP256)
+	benchmarkClient(b, oprf.BaseMode, oprf.SuiteP256)
 }
 
 func BenchmarkClientVerifiableModeOPRFP256(b *testing.B) {
-	benchmarkClient(b, oprf.VerifiableMode, oprf.OPRFP256)
+	benchmarkClient(b, oprf.VerifiableMode, oprf.SuiteP256)
+}
+
+func BenchmarkClientPartiallyObliviousModeOPRFP256(b *testing.B) {
+	benchmarkClient(b, oprf.PartialObliviousMode, oprf.SuiteP256)
 }
 
 func BenchmarkClientBaseModeOPRFP384(b *testing.B) {
-	benchmarkClient(b, oprf.BaseMode, oprf.OPRFP384)
+	benchmarkClient(b, oprf.BaseMode, oprf.SuiteP384)
 }
 
 func BenchmarkClientVerifiableModeOPRFP384(b *testing.B) {
-	benchmarkClient(b, oprf.VerifiableMode, oprf.OPRFP384)
+	benchmarkClient(b, oprf.VerifiableMode, oprf.SuiteP384)
+}
+
+func BenchmarkClientPartiallyObliviousModeOPRFP384(b *testing.B) {
+	benchmarkClient(b, oprf.PartialObliviousMode, oprf.SuiteP384)
 }
 
 func BenchmarkClientBaseModeOPRFP521(b *testing.B) {
-	benchmarkClient(b, oprf.BaseMode, oprf.OPRFP521)
+	benchmarkClient(b, oprf.BaseMode, oprf.SuiteP521)
 }
 
 func BenchmarkClientVerifiableModeOPRF521(b *testing.B) {
-	benchmarkClient(b, oprf.VerifiableMode, oprf.OPRFP521)
+	benchmarkClient(b, oprf.VerifiableMode, oprf.SuiteP521)
+}
+
+func BenchmarkClientPartiallyObliviousModeOPRFP521(b *testing.B) {
+	benchmarkClient(b, oprf.PartialObliviousMode, oprf.SuiteP521)
 }

@@ -3,23 +3,24 @@ package main
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/cloudflare/circl/oprf"
 )
 
 // WrappedPseudonimizeRequest allows to partially parse the JSON input
 type WrappedPseudonimizeRequest struct {
+	Suite      string            `json:"suite"`
 	Data       []json.RawMessage `json:"data"`
 	Mode       oprf.Mode         `json:"mode"`
-	Suite      oprf.SuiteID      `json:"suite"`
 	ReturnInfo bool              `json:"return-info"`
 }
 
 // PseudonimizeRequest holds the data and the client setup parameters.
 type PseudonimizeRequest struct {
-	Data       [][]byte     `json:"data"`
-	Mode       oprf.Mode    `json:"mode"`
-	Suite      oprf.SuiteID `json:"suite"`
-	ReturnInfo bool         `json:"return-info"`
+	Suite      string    `json:"suite"`
+	Data       [][]byte  `json:"data"`
+	Mode       oprf.Mode `json:"mode"`
+	ReturnInfo bool      `json:"return-info"`
 }
 
 // ValidateMode validates the client mode (Base or Verifiable).
@@ -35,7 +36,7 @@ func (p *PseudonimizeRequest) ValidateMode() error {
 // ValidateSuite validates the encryption suite (P256, P384, P521).
 func (p *PseudonimizeRequest) ValidateSuite() error {
 	switch p.Suite {
-	case oprf.OPRFP256, oprf.OPRFP384, oprf.OPRFP521:
+	case oprf.SuiteP256.Identifier(), oprf.SuiteP384.Identifier(), oprf.SuiteP521.Identifier():
 		return nil
 	}
 

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/cloudflare/circl/oprf"
@@ -9,20 +10,71 @@ import (
 
 // EvaluationRequest represents an evaluation requests
 type EvaluationRequest struct {
-	Suite           oprf.SuiteID   `json:"suite"`
-	Mode            oprf.Mode      `json:"mode"`
-	Info            string         `json:"info"`
-	BlindedElements []oprf.Blinded `json:"blinded_elements"` // or use []string
+	Suite           string    `json:"suite"`
+	Info            string    `json:"info"`
+	BlindedElements [][]byte  `json:"blinded_elements"`
+	Mode            oprf.Mode `json:"mode"`
 }
 
 type EvaluationResponse struct {
 	Evaluation          *oprf.Evaluation `json:"evaluation"`
+	Suite               string           `json:"suite"`
 	SerializedPublicKey []byte           `json:"serialized_public_key"`
 }
 
-func NewEvaluationResponse(evaluation *oprf.Evaluation, serializedPublicKey []byte) *EvaluationResponse {
+// WrappedEvaluationResponse allows to partially parse the JSON input
+type WrappedEvaluationResponse struct {
+	Evaluation          *WrappedEvaluation `json:"evaluation"`
+	Suite               string             `json:"suite"`
+	SerializedPublicKey []byte             `json:"serialized_public_key"`
+}
+
+type WrappedEvaluation struct {
+	Proof    []byte   `json:"proof"`
+	Elements [][]byte `json:"elements"`
+}
+
+// UnmarshalJSON first parse the JSON input into a WrappedEvaluationResponse
+// and then convert the string into a byte array into EvaluationResponse.
+func (r *EvaluationResponse) MarshalJSON() ([]byte, error) {
+	elements := r.Evaluation.Elements
+	rawElements := make([][]byte, len(elements))
+
+	for index, element := range elements {
+		blindedElement, err := element.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+
+		rawElements[index] = blindedElement
+	}
+
+	var (
+		proof []byte
+		err   error
+	)
+
+	if r.Evaluation.Proof != nil {
+		proof, err = r.Evaluation.Proof.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return json.Marshal(WrappedEvaluationResponse{
+		Evaluation: &WrappedEvaluation{
+			Proof:    proof,
+			Elements: rawElements,
+		},
+		Suite:               r.Suite,
+		SerializedPublicKey: r.SerializedPublicKey,
+	})
+}
+
+func NewEvaluationResponse(evaluation *oprf.Evaluation, suiteID string, serializedPublicKey []byte) *EvaluationResponse {
 	return &EvaluationResponse{
 		Evaluation:          evaluation,
+		Suite:               suiteID,
 		SerializedPublicKey: serializedPublicKey,
 	}
 }
@@ -30,14 +82,14 @@ func NewEvaluationResponse(evaluation *oprf.Evaluation, serializedPublicKey []by
 // GetKeysHandler is an endpoint returning the static keys
 func (s *OPRFServerController) GetKeysHandler(c echo.Context) error {
 	s.keysMu.RLock()
-	keys := make(map[oprf.SuiteID][]byte)
+	keys := make(map[string][]byte)
 
 	for suiteID, privateKey := range s.keys {
 		keys[suiteID] = SerializePublicKey(privateKey)
 	}
 	s.keysMu.RUnlock()
 
-	return c.JSON(http.StatusOK, &keys)
+	return c.JSON(http.StatusOK, &keys) //nolint:wrapcheck
 }
 
 // EvaluateHandler is an endpoint that evaluate an EvaluationRequest.
@@ -64,8 +116,18 @@ func (s *OPRFServerController) EvaluateHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "No server")
 	}
 
+	blindedElements, err := DeserializeElements(evaluationRequest.BlindedElements, server.Suite().Group())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Couldn't decode the blinded elements")
+	}
+
 	// Calculate the evaluation
-	evaluation, err := server.Evaluate(evaluationRequest.BlindedElements, []byte(evaluationRequest.Info))
+	evaluation, err := server.Evaluate(
+		&oprf.EvaluationRequest{
+			Elements: blindedElements,
+		},
+		[]byte(evaluationRequest.Info),
+	)
 	if err != nil || evaluation == nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -75,7 +137,7 @@ func (s *OPRFServerController) EvaluateHandler(c echo.Context) error {
 	serializedPublicKey := SerializePublicKey(s.keys[evaluationRequest.Suite])
 	s.keysMu.RUnlock()
 
-	response := NewEvaluationResponse(evaluation, serializedPublicKey)
+	response := NewEvaluationResponse(evaluation, server.Suite().Identifier(), serializedPublicKey)
 
 	return c.JSON(http.StatusOK, response) //nolint:wrapcheck
 }

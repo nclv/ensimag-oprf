@@ -2,18 +2,20 @@ package controllers
 
 import (
 	"encoding/base64"
-	"github.com/cloudflare/circl/oprf"
 	"testing"
+
+	"github.com/cloudflare/circl/oprf"
 )
 
 func TestLoadPrivateKey(t *testing.T) {
 	serializedBase64Key := "AtzyGS8NoBjEjqbhwdGY/zWyqdFkJghyTttoIGq4UoM="
-	privateKey, err := LoadPrivateKey(oprf.OPRFP256, serializedBase64Key)
+
+	privateKey, err := LoadPrivateKey(oprf.SuiteP256, serializedBase64Key)
 	if err != nil {
 		t.Error(err)
 	}
 
-	serializedKey, err := privateKey.Serialize()
+	serializedKey, err := privateKey.MarshalBinary()
 	if err != nil {
 		t.Error(err)
 	}

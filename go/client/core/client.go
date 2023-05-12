@@ -1,55 +1,36 @@
 package core
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"time"
 
 	"github.com/cloudflare/circl/oprf"
 )
 
 // Client regroup an HTTP client and an OPRF client
 type Client struct {
-	serverURL string
-
-	httpClient *http.Client
-	oprfClient *oprf.Client
-
-	publicKeys map[oprf.SuiteID]*oprf.PublicKey
+	httpClient *HTTPClient
+	oprfClient OprfClientInterface
+	// suite:public key
+	publicKeys map[string]*oprf.PublicKey
 }
 
-// NewClient returns a new client
-func NewClient(serverURL string) *Client {
-	// TODO: https client with http.Transport
-	return &Client{
-		serverURL:  serverURL,
-		httpClient: &http.Client{Timeout: 15 * time.Second},
+// NewClient returns a new HTTP + OPRF client with the provided server URL, suite, mode and static key.
+// No static key is needed for oprf.BaseMode.
+func NewClient(serverURL string, suite oprf.Suite, mode oprf.Mode) *Client {
+	client := &Client{
+		httpClient: NewHttpClient(serverURL),
 	}
-}
-
-// SetOPRFClientPublicKey update the OPRF client to use the provided public key.
-// The public key is only needed for the verifiable mode so this method does nothing in base mode.
-func (c *Client) SetOPRFClientPublicKey(publicKey *oprf.PublicKey) error {
-	if c.oprfClient.Mode == oprf.VerifiableMode {
-		oprfClient, err := oprf.NewVerifiableClient(c.oprfClient.SuiteID, publicKey)
-		if err != nil {
-			log.Println("error when setting OPRF client public key", err)
-
-			return err
-		}
-
-		c.oprfClient = oprfClient
+	if err := client.setupOPRFClient(suite, mode); err != nil {
+		log.Fatal(err)
 	}
 
-	return nil
+	return client
 }
 
 // SetupOPRFClient retrieve the server's public keys and create the OPRF client.
-func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
-	serializedPublicKeys, err := c.GetPublicKeys()
+func (c *Client) setupOPRFClient(suite oprf.Suite, mode oprf.Mode) error {
+	serializedPublicKeys, err := c.httpClient.GetPublicKeys()
 	if err != nil {
 		log.Println("error when getting the static keys")
 
@@ -64,103 +45,34 @@ func (c *Client) SetupOPRFClient(suite oprf.SuiteID, mode oprf.Mode) error {
 	}
 
 	c.publicKeys = publicKeys
-	publicKey := publicKeys[suite]
 
-	oprfClient, err := NewOPRFClient(suite, mode, publicKey)
-	if err != nil {
-		log.Println("error when setting up the OPRF client")
-
-		return err
-	}
-
-	c.oprfClient = oprfClient
+	publicKey := publicKeys[suite.Identifier()]
+	c.oprfClient = NewOPRFClient(suite, mode, publicKey)
 
 	return nil
 }
 
-// GetPublicKeys returns the public keys from the server
-func (c *Client) GetPublicKeys() (map[oprf.SuiteID][]byte, error) {
-	req, err := http.NewRequest("GET", c.serverURL+PublicKeysEndpoint, nil)
-	if err != nil {
-		log.Println("HTTP NewRequest error :", err)
-
-		return nil, fmt.Errorf("HTTP NewRequest error : %w", err)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		log.Println("HTTP Do :", err)
-
-		return nil, fmt.Errorf("HTTP Do error : %w", err)
-	}
-	defer resp.Body.Close()
-
-	var publicKeys map[oprf.SuiteID][]byte
-	if err := json.NewDecoder(resp.Body).Decode(&publicKeys); err != nil {
-		log.Println("JSON decoder error :", err)
-
-		return nil, fmt.Errorf("JSON decoder error : %w", err)
-	}
-
-	// log.Println(publicKeys, base64.StdEncoding.EncodeToString(publicKeys[common.OPRFP256]))
-
-	return publicKeys, nil
+// Blind generates a request for the server by passing an array of inputs to be evaluated by server.
+func (c *Client) Blind(inputs [][]byte) (*oprf.FinalizeData, *oprf.EvaluationRequest, error) {
+	return c.oprfClient.Blind(inputs)
 }
 
-// CreateRequest generates a request for the server by passing an array of inputs to be evaluated by server.
-func (c *Client) CreateRequest(inputs [][]byte) (*oprf.ClientRequest, error) {
-	clientRequest, err := c.oprfClient.Request(inputs)
-	if err != nil {
-		log.Println("OPRF client request creation error :", err)
-
-		return nil, fmt.Errorf("OPRF client request creation error : %w", err)
-	}
-
-	return clientRequest, nil
+// DeterministicBlind generates a request for the server by passing an array of inputs and serialized blinds to be evaluated by server.
+// Use FinalizedData.CopyBlinds() to get the serialized blinds from a previous call to client.Blind(inputs)
+func (c *Client) DeterministicBlind(inputs [][]byte, blinds []oprf.Blind) (*oprf.FinalizeData, *oprf.EvaluationRequest, error) {
+	return c.oprfClient.DeterministicBlind(inputs, blinds)
 }
 
-// EvaluateRequest evaluate an EvaluationRequest into an EvaluationResponse
 func (c *Client) EvaluateRequest(evaluationRequest *EvaluationRequest) (*EvaluationResponse, error) {
-	data, err := json.Marshal(&evaluationRequest)
-	if err != nil {
-		log.Println("evaluation request marshalling error :", err)
-
-		return nil, fmt.Errorf("evaluation request marshalling error : %w", err)
-	}
-
-	req, err := http.NewRequest("POST", c.serverURL+EvaluateEndpoint, bytes.NewBuffer(data))
-	if err != nil {
-		log.Println("HTTP NewRequest error :", err)
-
-		return nil, fmt.Errorf("HTTP NewRequest error : %w", err)
-
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		log.Println("HTTP Do :", err)
-
-		return nil, fmt.Errorf("HTTP Do error : %w", err)
-	}
-	defer resp.Body.Close()
-
-	var evaluationResponse EvaluationResponse
-	if err = json.NewDecoder(resp.Body).Decode(&evaluationResponse); err != nil {
-		log.Println("JSON decoder error :", err)
-
-		return nil, fmt.Errorf("JSON decoder error : %w", err)
-	}
-
-	return &evaluationResponse, nil
+	return c.httpClient.EvaluateRequest(evaluationRequest)
 }
 
 // Finalize computes the signed token from the server Evaluation and returns the output of the
 // OPRF protocol. The function uses server's static key to verify the proof in verifiable mode.
-func (c *Client) Finalize(clientRequest *oprf.ClientRequest,
-	evaluation *oprf.Evaluation, info string) ([][]byte, error) {
-	clientOutputs, err := c.oprfClient.Finalize(clientRequest, evaluation, []byte(info))
+func (c *Client) Finalize(finalizeData *oprf.FinalizeData,
+	evaluation *oprf.Evaluation, info string,
+) ([][]byte, error) {
+	clientOutputs, err := c.oprfClient.Finalize(finalizeData, evaluation, []byte(info))
 	if err != nil || clientOutputs == nil {
 		log.Println("Finalize error :", err, clientOutputs)
 

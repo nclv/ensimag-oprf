@@ -2,8 +2,10 @@ goos: linux
 goarch: amd64
 pkg: github.com/ensimag-oprf/go/client/core
 cpu: AMD Ryzen 7 5800X 8-Core Processor             
-BenchmarkClientBaseModeOPRFP256-16    	2023/05/12 16:50:27 HTTP Do : Post "http://localhost:1323/api/evaluate": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-2023/05/12 16:50:27 HTTP Do error : Post "http://localhost:1323/api/evaluate": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
-exit status 1
-FAIL	github.com/ensimag-oprf/go/client/core	15.044s
-FAIL
+BenchmarkClientBaseModeOPRFP256-16    	    2938	    411030 ns/op	   73852 B/op	     421 allocs/op
+BenchmarkClientBaseModeOPRFP256-16    	    2953	    415058 ns/op	   73856 B/op	     421 allocs/op
+BenchmarkClientBaseModeOPRFP256-16    	    2692	    410410 ns/op	   73847 B/op	     421 allocs/op
+BenchmarkClientBaseModeOPRFP256-16    	    2767	    407920 ns/op	   73844 B/op	     421 allocs/op
+BenchmarkClientBaseModeOPRFP256-16    	    2940	    429486 ns/op	   73846 B/op	     421 allocs/op
+PASS
+ok  	github.com/ensimag-oprf/go/client/core	7.326s

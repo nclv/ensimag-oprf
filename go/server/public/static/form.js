@@ -51,7 +51,7 @@ async function handleFormSubmit(event) {
 	console.log(formObject);
 
 	formObject["mode"] = parseInt(formObject["mode"]);
-	formObject["suite"] = parseInt(formObject["suite"]);
+	formObject["suite"] = formObject["suite"];
 	formObject["return-info"] = formObject["return-info"] === 'true';
 	formObject["data"] = formObject["data"].split(";");
 

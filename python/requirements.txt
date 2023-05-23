@@ -22,7 +22,7 @@ platformdirs==2.4.0
 pycparser==2.21
 rbcl==0.1.8
 regex==2021.11.10
-requests==2.26.0
+requests==2.31.0
 six==1.16.0
 tomli==1.2.2
 typing-extensions==4.0.0

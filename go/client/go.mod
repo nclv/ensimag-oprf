@@ -2,7 +2,7 @@ module github.com/ensimag-oprf/go/client
 
 go 1.17
 
-require github.com/cloudflare/circl v1.3.3
+require github.com/cloudflare/circl v1.3.7
 
 require (
 	github.com/bwesterb/go-ristretto v1.2.3 // indirect

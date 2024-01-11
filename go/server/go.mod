@@ -3,7 +3,7 @@ module github.com/ensimag-oprf/go/server
 go 1.17
 
 require (
-	github.com/cloudflare/circl v1.3.3
+	github.com/cloudflare/circl v1.3.7
 	github.com/labstack/echo/v4 v4.10.2
 )
 

@@ -1,7 +1,7 @@
 bcl==2.0.0
 bitlist==0.5.1
 black==24.3.0
-certifi==2023.7.22
+certifi==2024.7.4
 cffi==1.14.6
 charset-normalizer==2.0.8
 click==8.0.3
